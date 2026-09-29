@@ -19,7 +19,7 @@ Tous les créneaux de padel libres des clubs autour de Liège, sur les 7 prochai
 | MATCHi | Goose Padel Visé |
 | Big Captain | TPC Embourg |
 
-Playtomic, Sport-finder et MATCHi refusent les requêtes venant des serveurs de GitHub (HTTP 403). Leurs 8 clubs sont relevés par un raccourci iPhone (voir « Clubs relevés par l'iPhone »). Les 17 autres sont collectés automatiquement.
+Playtomic, Sport-finder et MATCHi refusent les requêtes venant des serveurs de GitHub (HTTP 403). Leurs 8 clubs sont relevés par un script sur l'iPhone (voir « Clubs relevés par l'iPhone »). Les 17 autres sont collectés automatiquement.
 
 Non couverts, faute de réservation en ligne lisible sans compte : RTC Liège (padel « bientôt disponible »), Royal Fayenbois, Elite Soccer & Padel, Tennissimo, TPC Haut-Clocher.
 
@@ -128,7 +128,7 @@ En production, un site qui change de structure fait passer son club en erreur (p
 
 - Une requête toutes les 1,5 à 3,5 secondes par site. Les plateformes sont interrogées en parallèle, mais jamais deux requêtes à la fois vers le même site.
 - En-têtes d'un navigateur ordinaire, une seule reprise en cas d'erreur, puis abandon jusqu'à la collecte suivante.
-- Environ 130 requêtes par collecte automatique pour 17 clubs, toutes les 30 minutes, dont 110 vers Doinsport (7 jours pour 14 clubs). Le raccourci iPhone en ajoute environ 60, seulement quand vous le lancez.
+- Environ 130 requêtes par collecte automatique pour 17 clubs, toutes les 30 minutes, dont 110 vers Doinsport (7 jours pour 14 clubs). Le script iPhone en ajoute environ 60, seulement quand vous le lancez.
 - Les sites qui refusent les serveurs de GitHub ne sont plus sollicités depuis GitHub.
 
 ## Clubs relevés par l'iPhone
@@ -136,55 +136,27 @@ En production, un site qui change de structure fait passer son club en erreur (p
 Les clubs marqués `via=telephone` dans `config/clubs.csv` ne sont jamais interrogés depuis GitHub. À la place :
 
 1. Chaque collecte publie la liste des adresses à interroger : `data/telephone-requetes.json`.
-2. Le raccourci « Padel » de l'iPhone interroge ces adresses depuis le téléphone (environ 60 requêtes, moins d'une minute), puis dépose les réponses dans le fichier `envoi.gz` de la branche `telephone`.
-3. Le raccourci lance ensuite l'Action (mode « iPhone »), qui relit les réponses avec les adaptateurs habituels. La page est à jour 1 à 2 minutes plus tard.
+2. Le script « Padel » de l'app Scriptable interroge ces adresses depuis l'iPhone (environ 60 requêtes, moins d'une minute), puis remplace le contenu de la branche `telephone` par ses réponses (fichier `envoi.json`, sans historique).
+3. Il lance ensuite l'Action en mode « iPhone », qui relit les réponses avec les adaptateurs habituels, et attend la fin de la mise à jour (1 à 2 minutes).
 4. Les collectes suivantes réutilisent ce dernier envoi. La page indique « Relevé par l'iPhone il y a… » et propose le bouton **Actualiser depuis l'iPhone** quand il date de plus d'une heure.
 
-Les noms des terrains Playtomic viennent de `config/terrains_playtomic.json`, pour que le raccourci n'ait pas à télécharger les pages des clubs. Si un club Playtomic change ses terrains, lancez depuis votre ordinateur `py outils/terrains_playtomic.py`, puis commitez le fichier.
+Les noms des terrains Playtomic viennent de `config/terrains_playtomic.json`, pour que le script n'ait pas à télécharger les pages des clubs. Si un club Playtomic change ses terrains, lancez depuis votre ordinateur `py outils/terrains_playtomic.py`, puis commitez le fichier.
 
-### Réglages à faire une fois sur GitHub
+### Clé d'accès (une fois)
 
-- **Clé d'accès pour le raccourci** : photo de profil, puis *Settings*, *Developer settings*, *Personal access tokens*, *Fine-grained tokens*, *Generate new token*.
-  - Nom : `Raccourci Padel`. Expiration : 1 an.
-  - *Repository access* : *Only select repositories*, puis `padel-liege`.
-  - *Permissions*, *Repository permissions* : *Contents* **Read and write** (déposer l'envoi) et *Actions* **Read and write** (lancer la mise à jour). Rien d'autre.
-  - Copiez la clé (elle commence par `github_pat_`). Elle ne va que dans le raccourci, jamais dans le dépôt.
+Photo de profil GitHub, puis *Settings*, *Developer settings*, *Personal access tokens*, *Fine-grained tokens*, *Generate new token* :
 
-### Construire le raccourci « Padel »
+- Nom : `Raccourci Padel`. Expiration : 1 an.
+- *Repository access* : *Only select repositories*, puis `padel-liege`.
+- *Repository permissions* : *Contents* **Read and write** (déposer l'envoi) et *Actions* **Read and write** (lancer la mise à jour). Rien d'autre.
 
-Dans l'application Raccourcis, créez un raccourci nommé exactement **Padel** (le bouton de la page l'appelle par ce nom), avec ces actions dans l'ordre :
+La clé (`github_pat_…`) est demandée par le script au premier lancement et rangée dans le trousseau de l'iPhone. Elle n'est jamais écrite dans le dépôt. Si elle expire, le script la redemande.
 
-1. **Obtenir le contenu de l'URL** : `https://virgilejdb.github.io/padel-liege/data/telephone-requetes.json`
-2. **Définir la variable** : nom `Envoi`, valeur *Contenu de l'URL*.
-3. **Dictionnaire** : laissez-le vide.
-4. **Définir la variable** : nom `Réponses`, valeur *Dictionnaire*.
-5. **Obtenir la valeur du dictionnaire** : *Valeur* pour la clé `requetes` dans `Envoi`.
-6. **Répéter avec chaque élément** de *Valeur du dictionnaire*. À l'intérieur de la boucle :
-   1. **Obtenir le contenu de l'URL** : *Élément répété*.
-   2. **Remplacer le texte** : rechercher `\s+`, remplacer par un espace, dans *Contenu de l'URL*. Touchez *Afficher plus* et activez *Expression régulière*.
-   3. **Définir la valeur du dictionnaire** : clé *Élément répété*, valeur *Texte mis à jour*, dans `Réponses`.
-   4. **Définir la variable** : nom `Réponses`, valeur *Dictionnaire*.
-7. **Définir la valeur du dictionnaire** : clé `reponses`, valeur `Réponses`, dans `Envoi`.
-8. **Texte** : insérez la variable *Dictionnaire* (le résultat de l'étape 7).
-9. **Créer une archive** : à partir de *Texte*, format `.gz` (`.zip` ou `.tar.gz` fonctionnent aussi).
-10. **Encoder en base64** : *Archive*, sauts de ligne : *Aucun*.
-11. **Obtenir le contenu de l'URL** : `https://api.github.com/repos/virgilejdb/padel-liege/contents/envoi.gz?ref=telephone`. Touchez *Afficher plus*, puis *En-têtes*, et ajoutez :
-    - `Authorization` : `Bearer ` suivi de votre clé ;
-    - `Accept` : `application/vnd.github+json`.
-12. **Obtenir la valeur du dictionnaire** : *Valeur* pour la clé `sha` dans *Contenu de l'URL*.
-13. **Obtenir le contenu de l'URL** : `https://api.github.com/repos/virgilejdb/padel-liege/contents/envoi.gz`. Méthode **PUT**, les deux mêmes en-têtes, corps de requête **JSON** avec quatre champs de type texte :
-    - `message` : `Envoi iPhone` ;
-    - `content` : *Texte encodé* (étape 10) ;
-    - `sha` : *Valeur du dictionnaire* (étape 12) ;
-    - `branch` : `telephone`.
-14. **Obtenir le contenu de l'URL** : `https://api.github.com/repos/virgilejdb/padel-liege/actions/workflows/collecte.yml/dispatches`. Méthode **POST**, les deux mêmes en-têtes, corps **JSON** :
-    - `ref` (texte) : `main` ;
-    - `inputs` (dictionnaire) contenant `iphone` (texte) : `true`.
-15. **Afficher la notification** : `Envoyé : la page sera à jour dans 1 à 2 minutes.`
+### Installation sur l'iPhone
 
-Pour le lancer : bouton **Actualiser depuis l'iPhone** de la page, widget Raccourcis, ou icône sur l'écran d'accueil (appui long sur le raccourci, *Partager*, *Sur l'écran d'accueil*). Ne partagez pas ce raccourci : il contient votre clé.
+Ouvrez `https://virgilejdb.github.io/padel-liege/iphone.html` sur l'iPhone et suivez les étapes : installer Scriptable, copier le script (`docs/iphone/padel.js`), le coller dans un nouveau script nommé exactement **Padel**, le lancer une fois.
 
-En cas d'échec, le journal de l'Action (onglet *Actions*) indique pour chaque club ce qui manque dans l'envoi.
+Pour le lancer ensuite : bouton **Actualiser depuis l'iPhone** de la page (lien `scriptable:///run/Padel`), ou widget Scriptable. En cas d'échec, le script affiche la cause, et le journal de l'Action (onglet *Actions*) indique pour chaque club ce qui manque dans l'envoi.
 
 ## Variante locale
 

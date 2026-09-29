@@ -44,7 +44,9 @@ jobs:
       - name: Dernier envoi du raccourci iPhone
         id: iphone
         run: |
-          if git fetch --depth=1 origin telephone 2>/dev/null && git show FETCH_HEAD:envoi.gz > "$RUNNER_TEMP/envoi.gz" 2>/dev/null; then
+          if git fetch --depth=1 origin telephone 2>/dev/null && \
+             { git show FETCH_HEAD:envoi.json > "$RUNNER_TEMP/envoi" 2>/dev/null || \
+               git show FETCH_HEAD:envoi.gz > "$RUNNER_TEMP/envoi" 2>/dev/null; }; then
             echo "date=$(git log -1 --format=%cI FETCH_HEAD)" >> "$GITHUB_OUTPUT"
             echo "Envoi iPhone du $(git log -1 --format=%cI FETCH_HEAD)"
           else
@@ -55,7 +57,7 @@ jobs:
         run: |
           options=(--precedent "${{ steps.pages.outputs.base_url }}/data/creneaux.json")
           if [ -n "${{ steps.iphone.outputs.date }}" ]; then
-            options+=(--telephone "$RUNNER_TEMP/envoi.gz" --telephone-date "${{ steps.iphone.outputs.date }}")
+            options+=(--telephone "$RUNNER_TEMP/envoi" --telephone-date "${{ steps.iphone.outputs.date }}")
           fi
           # Envoi iPhone : seulement ses clubs, les autres gardent leur état (page à jour en 1 à 2 min).
           if [ "${{ inputs.iphone }}" = "true" ]; then

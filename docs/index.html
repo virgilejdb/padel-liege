@@ -200,7 +200,7 @@ const DUREES = [30, 60, 90, 120];
 const LIEUX = [["tous", "Tous"], ["int", "Intérieur"], ["ext", "Extérieur"]];
 const RETARD_ALERTE_MIN = 90; // au delà, on signale une collecte en panne
 const IPHONE_ANCIEN_MIN = 60; // au delà, on propose d'actualiser les clubs relevés par l'iPhone
-const RACCOURCI = "shortcuts://run-shortcut?name=" + encodeURIComponent("Padel");
+const RACCOURCI = "scriptable:///run/Padel"; // script Scriptable installé via iphone.html
 const JOURS_COURTS = ["dim.", "lun.", "mar.", "mer.", "jeu.", "ven.", "sam."];
 const MOIS = ["janv.", "févr.", "mars", "avr.", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."];
 const PLATEFORMES = { doinsport: "Doinsport", playtomic: "Playtomic", sportfinder: "Sport-finder",
@@ -294,7 +294,9 @@ const parIphone = (c) => c.via === "telephone";
 const ageMin = (iso) => iso ? (Date.now() - new Date(iso).getTime()) / 60000 : Infinity;
 const iphoneAncien = (c) => parIphone(c) && ageMin(c.derniere_maj_ok) > IPHONE_ANCIEN_MIN;
 const enPanne = (c) => parIphone(c) ? c.statut === "erreur" : c.statut !== "ok";
-const boutonIphone = (texte = "Actualiser depuis l'iPhone") => el("a", { class: "bouton-iphone", href: RACCOURCI }, texte);
+// Au retour sur la page après le script, on recharge les données sans attendre les 5 minutes habituelles.
+const boutonIphone = (texte = "Actualiser depuis l'iPhone") => el("a", { class: "bouton-iphone", href: RACCOURCI,
+  onclick: () => { etat.charge = 0; } }, texte);
 
 function dessinerEtat() {
   const d = etat.donnees, clubs = d.clubs;
@@ -467,8 +469,8 @@ function ouvrirEtat() {
     el("h3", {}, "État des clubs"),
     el("div", { class: "sous" }, `Dernière collecte ${depuis(d.genere_le)} (${heureDe(d.genere_le)}). Actualisation toutes les 30 min environ.`),
     d.clubs.some(parIphone) ? el("p", { class: "note", style: "margin-top:0" },
-      "Playtomic, Sport-finder et MATCHi refusent les serveurs de GitHub : leurs clubs sont relevés par le raccourci « Padel » de l'iPhone. ",
-      boutonIphone("Lancer le raccourci")) : null,
+      "Playtomic, Sport-finder et MATCHi refusent les serveurs de GitHub : leurs clubs sont relevés par le script « Padel » de l'iPhone (",
+      el("a", { href: "iphone.html" }, "installation"), "). ", boutonIphone("Lancer le script")) : null,
     ...clubs.map((c) => el("div", { class: "etat-club" },
       el("div", {}, enPanne(c) ? el("span", { class: "ko" }, "✗ ") : parIphone(c) ? "📱 " : "✓ ", el("b", {}, c.nom),
         ` · ${PLATEFORMES[c.plateforme] || c.plateforme}`),

@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Padel sur iPhone</title>
+<meta name="theme-color" content="#0f1b2d">
+<link rel="icon" href="icones/icone-192.png" type="image/png">
+<style>
+:root { --fond: #f3f5f8; --carte: #fff; --texte: #142033; --doux: #5c6b80; --ligne: #dfe4ec; --balle: #c6ef3a; color-scheme: light; }
+@media (prefers-color-scheme: dark) {
+  :root { --fond: #0b1320; --carte: #141f31; --texte: #e8edf5; --doux: #93a1b5; --ligne: #243249; color-scheme: dark; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--fond); color: var(--texte); font: 16px/1.5 system-ui, -apple-system, sans-serif; }
+header { background: #0f1b2d; color: #fff; padding: calc(14px + env(safe-area-inset-top)) 16px 14px; }
+h1 { margin: 0; font-size: 20px; }
+header p { margin: 4px 0 0; color: #cdd6e3; font-size: 14px; }
+main { padding: 16px; display: grid; gap: 12px; max-width: 640px; margin: 0 auto; }
+.etape { background: var(--carte); border: 1px solid var(--ligne); border-radius: 16px; padding: 14px 16px; }
+.etape h2 { margin: 0 0 6px; font-size: 16px; display: flex; gap: 10px; align-items: center; }
+.num { flex: 0 0 26px; height: 26px; border-radius: 50%; background: var(--balle); color: #14230a; display: grid; place-items: center; font-size: 14px; }
+.etape p, .etape ol { margin: 6px 0 0; font-size: 15px; }
+.etape ol { padding-left: 20px; }
+b.ui { font-weight: 600; }
+.bouton {
+  display: block; width: 100%; margin-top: 10px; text-align: center; text-decoration: none; border: 0;
+  background: var(--balle); color: #14230a; font: inherit; font-weight: 700; border-radius: 14px; padding: 13px;
+}
+.bouton.secondaire { background: transparent; color: var(--texte); border: 1px solid var(--ligne); font-weight: 600; }
+#etat-copie { font-size: 14px; color: var(--doux); margin-top: 6px; min-height: 1.4em; }
+details { margin-top: 8px; font-size: 13px; color: var(--doux); }
+pre { white-space: pre-wrap; word-break: break-word; font-size: 11px; max-height: 240px; overflow: auto; background: var(--fond); padding: 8px; border-radius: 8px; }
+.note { font-size: 13.5px; color: var(--doux); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Padel sur iPhone</h1>
+  <p>Installation du relevé des clubs Playtomic, Sport-finder et MATCHi. À faire une seule fois, environ 3 minutes.</p>
+</header>
+<main>
+  <section class="etape">
+    <h2><span class="num">1</span>Installer Scriptable</h2>
+    <p>Application gratuite, qui fait tourner de petits scripts sur l'iPhone.</p>
+    <a class="bouton" href="https://apps.apple.com/app/scriptable/id1405459188">Ouvrir Scriptable dans l'App Store</a>
+    <p class="note">Installez-la, puis revenez sur cette page.</p>
+  </section>
+
+  <section class="etape">
+    <h2><span class="num">2</span>Copier le script</h2>
+    <button class="bouton" type="button" id="copier">Copier le script</button>
+    <div id="etat-copie"></div>
+    <details><summary>Voir le script</summary><pre id="script">Chargement…</pre></details>
+  </section>
+
+  <section class="etape">
+    <h2><span class="num">3</span>Coller le script dans Scriptable</h2>
+    <ol>
+      <li>Ouvrez <b class="ui">Scriptable</b> et touchez <b class="ui">+</b> en haut à droite.</li>
+      <li>Touchez la zone de texte vide, puis <b class="ui">Coller</b>.</li>
+      <li>Touchez le titre <b class="ui">Untitled Script</b> tout en haut et remplacez-le par <b class="ui">Padel</b>, exactement.</li>
+      <li>Touchez <b class="ui">Done</b> en haut à gauche.</li>
+    </ol>
+  </section>
+
+  <section class="etape">
+    <h2><span class="num">4</span>Premier lancement</h2>
+    <ol>
+      <li>Dans Scriptable, touchez la vignette <b class="ui">Padel</b>.</li>
+      <li>Le script demande votre clé GitHub : collez la clé <b class="ui">Raccourci Padel</b> (elle commence par <code>github_pat_</code>), puis <b class="ui">Enregistrer</b>. Elle est gardée dans le trousseau de l'iPhone et ne sera plus demandée.</li>
+      <li>Laissez l'application ouverte environ 2 minutes : le script interroge les sites, envoie les réponses, puis attend la mise à jour de la page.</li>
+      <li>À la fin, touchez <b class="ui">Ouvrir la page</b>.</li>
+    </ol>
+    <p class="note">Pour copier la clé sur l'iPhone : ouvrez-la dans les notes de l'ordinateur et envoyez-la-vous (AirDrop, Notes iCloud), ou collez-la depuis le presse-papiers partagé si l'iPhone et l'ordinateur sont sur le même compte Apple.</p>
+  </section>
+
+  <section class="etape">
+    <h2><span class="num">5</span>Ensuite</h2>
+    <p>Sur la page Padel Liège, le bouton <b class="ui">Actualiser depuis l'iPhone</b> lance ce script directement.</p>
+    <a class="bouton secondaire" href="./">Retour à la page Padel Liège</a>
+  </section>
+</main>
+<script>
+"use strict";
+let texte = "";
+fetch("iphone/padel.js", { cache: "no-store" })
+  .then((r) => r.ok ? r.text() : Promise.reject(new Error("HTTP " + r.status)))
+  .then((t) => { texte = t; document.getElementById("script").textContent = t; })
+  .catch(() => { document.getElementById("script").textContent = "Impossible de charger le script. Rechargez la page."; });
+
+document.getElementById("copier").addEventListener("click", async () => {
+  const etat = document.getElementById("etat-copie");
+  if (!texte) { etat.textContent = "Le script n'est pas encore chargé, réessayez dans un instant."; return; }
+  try {
+    await navigator.clipboard.writeText(texte);
+    etat.textContent = "Copié. Passez à l'étape 3.";
+  } catch {
+    // Secours : sélection manuelle du texte affiché.
+    const d = document.querySelector("details"); d.open = true;
+    const sel = window.getSelection(), plage = document.createRange();
+    plage.selectNodeContents(document.getElementById("script"));
+    sel.removeAllRanges(); sel.addRange(plage);
+    etat.textContent = "Copie automatique impossible : le script est sélectionné ci-dessous, touchez « Copier ».";
+  }
+});
+</script>
+</body>
+</html>
