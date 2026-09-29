@@ -1,0 +1,3 @@
+# Aucune dépendance pour la collecte (bibliothèque standard uniquement).
+# Sous Windows seulement, la base des fuseaux horaires :
+tzdata; sys_platform == "win32"

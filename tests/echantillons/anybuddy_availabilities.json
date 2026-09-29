@@ -1,0 +1,141 @@
+{
+ "bookingRules": null,
+ "data": [
+  {
+   "startDateTime": "2026-10-01T09:00",
+   "services": [
+    {
+     "id": "e2f1f895-9ecb-4bef-9993-e669abe19101",
+     "duration": 60,
+     "slotId": "MjAyNi0xMC0wMVQwOTowMF82MA==",
+     "price": 2000,
+     "discountPrice": 2000,
+     "serviceFeeText": "Les frais de service vous sont offerts pour ce club",
+     "serviceFee": 0,
+     "isCancellableNow": true,
+     "isCancellable": true,
+     "cancellationCondition": "Annulable jusqu'au jeu. 01/10 08h00.",
+     "refundCondition": "Remboursable jusqu'au jeu. 01/10 08h00.",
+     "freeCancellationHours": 1
+    },
+    {
+     "id": "ca178c93-a8ea-4876-950b-bae7665b4df9",
+     "duration": 60,
+     "slotId": "MjAyNi0xMC0wMVQwOTowMF82MA==",
+     "price": 2000,
+     "discountPrice": 2000,
+     "serviceFeeText": "Les frais de service vous sont offerts pour ce club",
+     "serviceFee": 0,
+     "isCancellableNow": true,
+     "isCancellable": true,
+     "cancellationCondition": "Annulable jusqu'au jeu. 01/10 08h00.",
+     "refundCondition": "Remboursable jusqu'au jeu. 01/10 08h00.",
+     "freeCancellationHours": 1
+    },
+    {
+     "id": "3a78c56f-f72e-4ff3-b225-d6373f082ece",
+     "duration": 60,
+     "slotId": "MjAyNi0xMC0wMVQwOTowMF82MA==",
+     "price": 2000,
+     "discountPrice": 2000,
+     "serviceFeeText": "Les frais de service vous sont offerts pour ce club",
+     "serviceFee": 0,
+     "isCancellableNow": true,
+     "isCancellable": true,
+     "cancellationCondition": "Annulable jusqu'au jeu. 01/10 08h00.",
+     "refundCondition": "Remboursable jusqu'au jeu. 01/10 08h00.",
+     "freeCancellationHours": 1
+    },
+    {
+     "id": "e2f1f895-9ecb-4bef-9993-e669abe19101",
+     "duration": 90,
+     "slotId": "MjAyNi0xMC0wMVQwOTowMF85MA==",
+     "price": 3000,
+     "discountPrice": 3000,
+     "serviceFeeText": "Les frais de service vous sont offerts pour ce club",
+     "serviceFee": 0,
+     "isCancellableNow": true,
+     "isCancellable": true,
+     "cancellationCondition": "Annulable jusqu'au jeu. 01/10 08h00.",
+     "refundCondition": "Remboursable jusqu'au jeu. 01/10 08h00.",
+     "freeCancellationHours": 1
+    },
+    {
+     "id": "ca178c93-a8ea-4876-950b-bae7665b4df9",
+     "duration": 90,
+     "slotId": "MjAyNi0xMC0wMVQwOTowMF85MA==",
+     "price": 3000,
+     "discountPrice": 3000,
+     "serviceFeeText": "Les frais de service vous sont offerts pour ce club",
+     "serviceFee": 0,
+     "isCancellableNow": true,
+     "isCancellable": true,
+     "cancellationCondition": "Annulable jusqu'au jeu. 01/10 08h00.",
+     "refundCondition": "Remboursable jusqu'au jeu. 01/10 08h00.",
+     "freeCancellationHours": 1
+    },
+    {
+     "id": "3a78c56f-f72e-4ff3-b225-d6373f082ece",
+     "duration": 90,
+     "slotId": "MjAyNi0xMC0wMVQwOTowMF85MA==",
+     "price": 3000,
+     "discountPrice": 3000,
+     "serviceFeeText": "Les frais de service vous sont offerts pour ce club",
+     "serviceFee": 0,
+     "isCancellableNow": true,
+     "isCancellable": true,
+     "cancellationCondition": "Annulable jusqu'au jeu. 01/10 08h00.",
+     "refundCondition": "Remboursable jusqu'au jeu. 01/10 08h00.",
+     "freeCancellationHours": 1
+    }
+   ]
+  },
+  {
+   "startDateTime": "2026-10-01T10:00",
+   "services": [
+    {
+     "id": "e2f1f895-9ecb-4bef-9993-e669abe19101",
+     "duration": 60,
+     "slotId": "MjAyNi0xMC0wMVQxMDowMF82MA==",
+     "price": 2000,
+     "discountPrice": 2000,
+     "serviceFeeText": "Les frais de service vous sont offerts pour ce club",
+     "serviceFee": 0,
+     "isCancellableNow": true,
+     "isCancellable": true,
+     "cancellationCondition": "Annulable jusqu'au jeu. 01/10 09h00.",
+     "refundCondition": "Remboursable jusqu'au jeu. 01/10 09h00.",
+     "freeCancellationHours": 1
+    },
+    {
+     "id": "ca178c93-a8ea-4876-950b-bae7665b4df9",
+     "duration": 60,
+     "slotId": "MjAyNi0xMC0wMVQxMDowMF82MA==",
+     "price": 2000,
+     "discountPrice": 2000,
+     "serviceFeeText": "Les frais de service vous sont offerts pour ce club",
+     "serviceFee": 0,
+     "isCancellableNow": true,
+     "isCancellable": true,
+     "cancellationCondition": "Annulable jusqu'au jeu. 01/10 09h00.",
+     "refundCondition": "Remboursable jusqu'au jeu. 01/10 09h00.",
+     "freeCancellationHours": 1
+    },
+    {
+     "id": "3a78c56f-f72e-4ff3-b225-d6373f082ece",
+     "duration": 60,
+     "slotId": "MjAyNi0xMC0wMVQxMDowMF82MA==",
+     "price": 2000,
+     "discountPrice": 2000,
+     "serviceFeeText": "Les frais de service vous sont offerts pour ce club",
+     "serviceFee": 0,
+     "isCancellableNow": true,
+     "isCancellable": true,
+     "cancellationCondition": "Annulable jusqu'au jeu. 01/10 09h00.",
+     "refundCondition": "Remboursable jusqu'au jeu. 01/10 09h00.",
+     "freeCancellationHours": 1
+    }
+   ]
+  }
+ ]
+}

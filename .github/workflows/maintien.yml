@@ -1,0 +1,27 @@
+name: Maintien de la planification
+
+# GitHub désactive les tâches planifiées d'un dépôt public sans commit depuis 60 jours.
+# La collecte ne commitant rien, on ajoute un commit vide si le dernier date de plus de 40 jours.
+on:
+  schedule:
+    - cron: "0 5 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  maintien:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Commit vide si nécessaire
+        run: |
+          age=$(( ( $(date +%s) - $(git log -1 --format=%ct) ) / 86400 ))
+          echo "Dernier commit il y a $age jours"
+          if [ "$age" -ge 40 ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit --allow-empty -m "Maintien de la collecte planifiée"
+            git push
+          fi

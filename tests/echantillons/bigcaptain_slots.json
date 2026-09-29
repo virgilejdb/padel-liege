@@ -1,0 +1,74 @@
+{
+ "data": [
+  {
+   "id": "7017-2026-10-01_17:30:00_90",
+   "date": "2026-10-01",
+   "startTime": "17:30:00",
+   "endTime": "19:00:00",
+   "canBeBooked": true,
+   "numOfAvailabilites": 3,
+   "canBeBookedCriteria": {
+    "noConflictCriterion": true,
+    "futureEventCriterion": true,
+    "maxTimeBeforeBookingCriterion": true,
+    "minTimeBeforeBookingCriterion": true,
+    "minTimeBetweenTwoBookingsCriterion": true,
+    "maxNumberOfOngoingUpcomingBookingsCriterion": true,
+    "allowedDurationCriterion": true,
+    "membershipRequiredCriterion": true
+   },
+   "automaticResource": false,
+   "resources": [
+    5963,
+    5964,
+    5965
+   ]
+  },
+  {
+   "id": "7017-2026-10-01_19:00:00_90",
+   "date": "2026-10-01",
+   "startTime": "19:00:00",
+   "endTime": "20:30:00",
+   "canBeBooked": true,
+   "numOfAvailabilites": 2,
+   "canBeBookedCriteria": {
+    "noConflictCriterion": true,
+    "futureEventCriterion": true,
+    "maxTimeBeforeBookingCriterion": true,
+    "minTimeBeforeBookingCriterion": true,
+    "minTimeBetweenTwoBookingsCriterion": true,
+    "maxNumberOfOngoingUpcomingBookingsCriterion": true,
+    "allowedDurationCriterion": true,
+    "membershipRequiredCriterion": true
+   },
+   "automaticResource": false,
+   "resources": [
+    5964,
+    5965
+   ]
+  },
+  {
+   "id": "7017-2026-10-01_20:30:00_90",
+   "date": "2026-10-01",
+   "startTime": "20:30:00",
+   "endTime": "22:00:00",
+   "canBeBooked": true,
+   "numOfAvailabilites": 2,
+   "canBeBookedCriteria": {
+    "noConflictCriterion": true,
+    "futureEventCriterion": true,
+    "maxTimeBeforeBookingCriterion": true,
+    "minTimeBeforeBookingCriterion": true,
+    "minTimeBetweenTwoBookingsCriterion": true,
+    "maxNumberOfOngoingUpcomingBookingsCriterion": true,
+    "allowedDurationCriterion": true,
+    "membershipRequiredCriterion": true
+   },
+   "automaticResource": false,
+   "resources": [
+    5964,
+    5965
+   ]
+  }
+ ]
+}

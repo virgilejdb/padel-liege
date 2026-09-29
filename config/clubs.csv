@@ -1,0 +1,26 @@
+id,nom,commune,plateforme,parametres
+bayards,Bayards Sports,Liège,doinsport,club=49168acd-0bc0-4f0b-b98b-84a6b768743e;activites=ce8c306e-224a-4f24-aa9d-6500580924dc;site=bayardsclub
+squash22,Squash 22,Liège,doinsport,club=84a699dc-4de0-4fc9-a21f-cc080f30b324;activites=ce8c306e-224a-4f24-aa9d-6500580924dc;site=squash22
+cointe,RTC Cointe,Liège (Cointe),doinsport,club=53377be5-ab23-4f1a-8842-9179708faeca;activites=ce8c306e-224a-4f24-aa9d-6500580924dc;site=rtc-cointe-tennis-padel
+pp-herstal,Padel Passion Herstal,Herstal,doinsport,club=b557aff1-ed0a-4f2a-8405-0fcdbfbf5021;activites=3c28448b-73f8-4f74-b38c-d1661401cb89;site=herstalpadel
+pp-juprelle,Padel Passion Juprelle,Juprelle,doinsport,club=b557aff1-ed0a-4f2a-8405-0fcdbfbf5021;activites=3983783c-11ff-4f39-ac12-ae5fd5b8fabe;site=herstalpadel
+pp-engis,Padel Passion Engis,Engis,doinsport,club=b557aff1-ed0a-4f2a-8405-0fcdbfbf5021;activites=3ee7562f-b756-4cf5-811e-4474e276d60a;site=herstalpadel
+planet-ans,Planet Padel Ans,Ans,doinsport,club=94ead3f1-1a24-4f92-a5cf-cd1474675279;activites=ce8c306e-224a-4f24-aa9d-6500580924dc;site=planetpadel
+planet-stgeorges,Planet Padel Saint-Georges,Saint-Georges-sur-Meuse,doinsport,club=4eff1248-6a6f-4f81-8233-69723c720f99;activites=73394a20-708e-4ffc-b555-977ed52b7327+8ee9b629-c5b1-4fd5-a680-51b1288e2527;site=planetpadel
+flemalle,Padel Flémalle,Flémalle,doinsport,club=3fb7c100-327f-4fe3-b128-6af10d949a4a;activites=ce8c306e-224a-4f24-aa9d-6500580924dc;site=padelflemalle
+seraing,Seraing Tennis Club,Seraing,doinsport,club=51c508da-2b04-4f72-a6b8-3e7817f95a8d;activites=ce8c306e-224a-4f24-aa9d-6500580924dc;site=tcseraing
+neupre,TPC Neupré,Neupré,doinsport,club=0bcf0ff9-910e-4f8e-a14c-bc49852ab9ec;activites=73394a20-708e-4ffc-b555-977ed52b7327+8ee9b629-c5b1-4fd5-a680-51b1288e2527;site=neupre-tennis-padel
+just-padel,Just Padel,Nandrin,doinsport,club=fcba5649-c20a-4f98-b5c7-bd91fc13088d;activites=ce8c306e-224a-4f24-aa9d-6500580924dc;site=just-padel
+trooz,TC Trooz,Trooz,doinsport,club=720cea8e-5b94-4f4f-93f6-d5722f430479;activites=ce8c306e-224a-4f24-aa9d-6500580924dc;site=tennisclubdetrooz
+tultay,Padel Tultay,Sprimont,doinsport,club=fa0c18d6-65c9-4f38-9984-bab064a4437f;activites=ce8c306e-224a-4f24-aa9d-6500580924dc;site=padeltultay
+garrincha,GARRINCHA Liège Wandre,Liège (Wandre),playtomic,tenant=9e7c9904-3cd0-461f-bab8-b7a030bdf2d7;slug=garrincha-liege-wandre
+liers,Addict Padel Liers,Herstal (Liers),playtomic,tenant=f7e16b1f-7829-4eb7-bc29-3f2132becb58;slug=addict-padel-liers
+awans,Padel Square Awans,Awans,playtomic,tenant=6b99ad95-24cb-41e6-8e02-aeac1f365a7f;slug=padel-square-awans
+beaufays,Beaufays TC & Padel,Chaudfontaine (Beaufays),playtomic,tenant=d6f0424a-0c91-4780-8e37-7daaa6ff68f5;slug=beaufays-tennis-club-padel
+baudouin,Royal Baudouin TPC,Liège,sportfinder,produit=190;centre=19051;slug=royal-baudouin-tennis-padel-club
+grace,RTPC Grâce,Grâce-Hollogne,sportfinder,produit=206;centre=19056;slug=rtc-grace-padel;interieur=non
+trenta,Trenta Padel,Crisnée,sportfinder,produit=27;centre=318;slug=trenta-padel
+chenee,Chênée TSP,Liège (Chênée),anybuddy,slug=chenee-tennis-squash-padel-liege
+fleron,Horizon Padel Fléron,Fléron,anybuddy,slug=padel-fleron-centre-de-loisirs-retinne-fleron
+goose-vise,Goose Padel Visé,Visé,matchi,facility=1252;slug=goosepadelvise
+embourg,TPC Embourg,Chaudfontaine (Embourg),bigcaptain,tenant=242;alias=tc-embourg;discipline=7017;durees=90;interieur=non

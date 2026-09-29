@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+*.tmp
+# Données produites par la collecte : publiées sur GitHub Pages, jamais commitées.
+docs/data/

@@ -1,0 +1,48 @@
+name: Collecte des créneaux
+
+on:
+  schedule:
+    - cron: "7,37 * * * *"   # toutes les 30 min (GitHub peut retarder de quelques minutes)
+  workflow_dispatch:          # bouton « Run workflow » pour relancer à la main
+  push:
+    branches: [main]
+    paths: ["collecteur/**", "config/**", "docs/**", "tests/**", ".github/workflows/collecte.yml"]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: collecte
+  cancel-in-progress: false
+
+jobs:
+  collecte:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    environment:
+      name: github-pages
+      url: ${{ steps.deploiement.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Tests du format
+        run: python -m unittest discover -s tests -t . -v
+
+      - id: pages
+        uses: actions/configure-pages@v5
+
+      - name: Collecte (7 jours, tous les clubs)
+        run: python -m collecteur --precedent "${{ steps.pages.outputs.base_url }}/data/creneaux.json"
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+
+      - id: deploiement
+        uses: actions/deploy-pages@v4

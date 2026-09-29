@@ -1,0 +1,291 @@
+{
+ "@context": "/api/contexts/Field",
+ "@id": "/api/fields",
+ "@type": "hydra:Collection",
+ "hydra:totalItems": 2,
+ "hydra:member": [
+  {
+   "@id": "/api/fields/392",
+   "@type": "Field",
+   "descriptions": [],
+   "image": null,
+   "id": 392,
+   "name": "P1",
+   "archived_at": null,
+   "attributes": [
+    {
+     "@id": "/api/attributes/96",
+     "@type": "Attribute",
+     "center": "/api/centers/19051",
+     "boolean_value": null,
+     "value": {
+      "@id": "/api/attribute_values/2",
+      "@type": "AttributeValue",
+      "value": "double",
+      "sport": null
+     },
+     "definition": {
+      "@id": "/api/attribute_definitions/6",
+      "@type": "AttributeDefinition",
+      "code": "resource_size",
+      "choice_type": "enum",
+      "show_on_match_card": true
+     }
+    },
+    {
+     "@id": "/api/attributes/97",
+     "@type": "Attribute",
+     "center": "/api/centers/19051",
+     "boolean_value": null,
+     "value": {
+      "@id": "/api/attribute_values/14",
+      "@type": "AttributeValue",
+      "value": "exterior",
+      "sport": null
+     },
+     "definition": {
+      "@id": "/api/attribute_definitions/8",
+      "@type": "AttributeDefinition",
+      "code": "resource_type",
+      "choice_type": "enum",
+      "show_on_match_card": true
+     }
+    },
+    {
+     "@id": "/api/attributes/546",
+     "@type": "Attribute",
+     "center": "/api/centers/19051",
+     "boolean_value": null,
+     "value": {
+      "@id": "/api/attribute_values/17",
+      "@type": "AttributeValue",
+      "value": "glass",
+      "sport": null
+     },
+     "definition": {
+      "@id": "/api/attribute_definitions/28",
+      "@type": "AttributeDefinition",
+      "code": "resource_wall_type",
+      "choice_type": "enum",
+      "show_on_match_card": false
+     }
+    },
+    {
+     "@id": "/api/attributes/547",
+     "@type": "Attribute",
+     "center": "/api/centers/19051",
+     "boolean_value": null,
+     "value": {
+      "@id": "/api/attribute_values/23",
+      "@type": "AttributeValue",
+      "value": "led",
+      "sport": null
+     },
+     "definition": {
+      "@id": "/api/attribute_definitions/30",
+      "@type": "AttributeDefinition",
+      "code": "resource_lighting_type",
+      "choice_type": "enum",
+      "show_on_match_card": false
+     }
+    },
+    {
+     "@id": "/api/attributes/548",
+     "@type": "Attribute",
+     "center": "/api/centers/19051",
+     "boolean_value": null,
+     "value": {
+      "@id": "/api/attribute_values/25",
+      "@type": "AttributeValue",
+      "value": "blue",
+      "sport": null
+     },
+     "definition": {
+      "@id": "/api/attribute_definitions/31",
+      "@type": "AttributeDefinition",
+      "code": "resource_surface_color",
+      "choice_type": "enum",
+      "show_on_match_card": false
+     }
+    }
+   ]
+  },
+  {
+   "@id": "/api/fields/393",
+   "@type": "Field",
+   "descriptions": [],
+   "image": null,
+   "id": 393,
+   "name": "P2",
+   "archived_at": null,
+   "attributes": [
+    {
+     "@id": "/api/attributes/541",
+     "@type": "Attribute",
+     "center": "/api/centers/19051",
+     "boolean_value": null,
+     "value": {
+      "@id": "/api/attribute_values/2",
+      "@type": "AttributeValue",
+      "value": "double",
+      "sport": null
+     },
+     "definition": {
+      "@id": "/api/attribute_definitions/6",
+      "@type": "AttributeDefinition",
+      "code": "resource_size",
+      "choice_type": "enum",
+      "show_on_match_card": true
+     }
+    },
+    {
+     "@id": "/api/attributes/542",
+     "@type": "Attribute",
+     "center": "/api/centers/19051",
+     "boolean_value": null,
+     "value": {
+      "@id": "/api/attribute_values/14",
+      "@type": "AttributeValue",
+      "value": "exterior",
+      "sport": null
+     },
+     "definition": {
+      "@id": "/api/attribute_definitions/8",
+      "@type": "AttributeDefinition",
+      "code": "resource_type",
+      "choice_type": "enum",
+      "show_on_match_card": true
+     }
+    },
+    {
+     "@id": "/api/attributes/543",
+     "@type": "Attribute",
+     "center": "/api/centers/19051",
+     "boolean_value": null,
+     "value": {
+      "@id": "/api/attribute_values/17",
+      "@type": "AttributeValue",
+      "value": "glass",
+      "sport": null
+     },
+     "definition": {
+      "@id": "/api/attribute_definitions/28",
+      "@type": "AttributeDefinition",
+      "code": "resource_wall_type",
+      "choice_type": "enum",
+      "show_on_match_card": false
+     }
+    },
+    {
+     "@id": "/api/attributes/544",
+     "@type": "Attribute",
+     "center": "/api/centers/19051",
+     "boolean_value": null,
+     "value": {
+      "@id": "/api/attribute_values/23",
+      "@type": "AttributeValue",
+      "value": "led",
+      "sport": null
+     },
+     "definition": {
+      "@id": "/api/attribute_definitions/30",
+      "@type": "AttributeDefinition",
+      "code": "resource_lighting_type",
+      "choice_type": "enum",
+      "show_on_match_card": false
+     }
+    },
+    {
+     "@id": "/api/attributes/545",
+     "@type": "Attribute",
+     "center": "/api/centers/19051",
+     "boolean_value": null,
+     "value": {
+      "@id": "/api/attribute_values/25",
+      "@type": "AttributeValue",
+      "value": "blue",
+      "sport": null
+     },
+     "definition": {
+      "@id": "/api/attribute_definitions/31",
+      "@type": "AttributeDefinition",
+      "code": "resource_surface_color",
+      "choice_type": "enum",
+      "show_on_match_card": false
+     }
+    }
+   ]
+  }
+ ],
+ "hydra:view": {
+  "@id": "/api/fields?center=19051&partner=173&product=190&sports=68",
+  "@type": "hydra:PartialCollectionView"
+ },
+ "hydra:search": {
+  "@type": "hydra:IriTemplate",
+  "hydra:template": "/api/fields{?partner,sports,sports[],center,center[],partner,sports,sports[],center,center[]}",
+  "hydra:variableRepresentation": "BasicRepresentation",
+  "hydra:mapping": [
+   {
+    "@type": "IriTemplateMapping",
+    "variable": "partner",
+    "property": "center.defaultPartner",
+    "required": false
+   },
+   {
+    "@type": "IriTemplateMapping",
+    "variable": "sports",
+    "property": "sports",
+    "required": false
+   },
+   {
+    "@type": "IriTemplateMapping",
+    "variable": "sports[]",
+    "property": "sports",
+    "required": false
+   },
+   {
+    "@type": "IriTemplateMapping",
+    "variable": "center",
+    "property": "center",
+    "required": false
+   },
+   {
+    "@type": "IriTemplateMapping",
+    "variable": "center[]",
+    "property": "center",
+    "required": false
+   },
+   {
+    "@type": "IriTemplateMapping",
+    "variable": "partner",
+    "property": "center.defaultPartner",
+    "required": false
+   },
+   {
+    "@type": "IriTemplateMapping",
+    "variable": "sports",
+    "property": "sports",
+    "required": false
+   },
+   {
+    "@type": "IriTemplateMapping",
+    "variable": "sports[]",
+    "property": "sports",
+    "required": false
+   },
+   {
+    "@type": "IriTemplateMapping",
+    "variable": "center",
+    "property": "center",
+    "required": false
+   },
+   {
+    "@type": "IriTemplateMapping",
+    "variable": "center[]",
+    "property": "center",
+    "required": false
+   }
+  ]
+ }
+}

@@ -1,0 +1,491 @@
+{
+ "@context": "/contexts/ClubPlayground",
+ "@id": "/clubs/playgrounds",
+ "@type": "hydra:Collection",
+ "hydra:member": [
+  {
+   "@type": "ClubPlayground",
+   "@id": "/clubs/playgrounds/7e4198d4-7c98-4f1c-80bc-986f2864ed64",
+   "id": "7e4198d4-7c98-4f1c-80bc-986f2864ed64",
+   "name": "Padel 1 Intérieur  - CME Construct & Ocean Drive",
+   "bookingCancellationConditionType": "soft",
+   "bookingCancellationConditionCustomHours": null,
+   "indoor": true,
+   "enlightened": true,
+   "surface": "/surfaces/494bbae8-4c4d-4f76-a8f4-05c03481a223",
+   "closures": [],
+   "activities": [
+    {
+     "id": "73394a20-708e-4ffc-b555-977ed52b7327",
+     "name": "Padel intérieur",
+     "slots": [
+      {
+       "startAt": "06:00",
+       "paymentMethods": [
+        "complete",
+        "per_participant"
+       ],
+       "paymentProviders": [
+        "cb",
+        "wallet",
+        "payment_token"
+       ],
+       "instalmentPercentage": null,
+       "prices": [
+        {
+         "id": "139a1a88-c165-4f28-96de-4a0a4943d2e5",
+         "duration": 1800,
+         "pricePerParticipant": 300,
+         "participantCount": 4,
+         "accompanyingAsGuestEnabled": null,
+         "autoCancellationDelay": null,
+         "instalmentAmount": null,
+         "bookable": true
+        },
+        {
+         "id": "9c0d43da-1b1d-4f49-9120-e72fcd338f83",
+         "duration": 5400,
+         "pricePerParticipant": 900,
+         "participantCount": 4,
+         "accompanyingAsGuestEnabled": null,
+         "autoCancellationDelay": null,
+         "instalmentAmount": null,
+         "bookable": true
+        },
+        {
+         "id": "b3124970-bf44-4f1a-8ef6-b76614d123a8",
+         "duration": 3600,
+         "pricePerParticipant": 600,
+         "participantCount": 4,
+         "accompanyingAsGuestEnabled": null,
+         "autoCancellationDelay": null,
+         "instalmentAmount": null,
+         "bookable": true
+        },
+        {
+         "id": "c8142543-0ab3-4fad-bb25-eccdecd93fff",
+         "duration": 7200,
+         "pricePerParticipant": 1200,
+         "participantCount": 4,
+         "accompanyingAsGuestEnabled": null,
+         "autoCancellationDelay": null,
+         "instalmentAmount": null,
+         "bookable": true
+        }
+       ],
+       "userClientStepBookingDuration": 1800
+      },
+      {
+       "startAt": "06:30",
+       "paymentMethods": [
+        "complete",
+        "per_participant"
+       ],
+       "paymentProviders": [
+        "cb",
+        "wallet",
+        "payment_token"
+       ],
+       "instalmentPercentage": null,
+       "prices": [
+        {
+         "id": "139a1a88-c165-4f28-96de-4a0a4943d2e5",
+         "duration": 1800,
+         "pricePerParticipant": 300,
+         "participantCount": 4,
+         "accompanyingAsGuestEnabled": null,
+         "autoCancellationDelay": null,
+         "instalmentAmount": null,
+         "bookable": true
+        },
+        {
+         "id": "9c0d43da-1b1d-4f49-9120-e72fcd338f83",
+         "duration": 5400,
+         "pricePerParticipant": 900,
+         "participantCount": 4,
+         "accompanyingAsGuestEnabled": null,
+         "autoCancellationDelay": null,
+         "instalmentAmount": null,
+         "bookable": true
+        },
+        {
+         "id": "b3124970-bf44-4f1a-8ef6-b76614d123a8",
+         "duration": 3600,
+         "pricePerParticipant": 600,
+         "participantCount": 4,
+         "accompanyingAsGuestEnabled": null,
+         "autoCancellationDelay": null,
+         "instalmentAmount": null,
+         "bookable": true
+        },
+        {
+         "id": "c8142543-0ab3-4fad-bb25-eccdecd93fff",
+         "duration": 7200,
+         "pricePerParticipant": 1200,
+         "participantCount": 4,
+         "accompanyingAsGuestEnabled": null,
+         "autoCancellationDelay": null,
+         "instalmentAmount": null,
+         "bookable": true
+        }
+       ],
+       "userClientStepBookingDuration": 1800
+      },
+      {
+       "startAt": "07:00",
+       "paymentMethods": [
+        "complete",
+        "per_participant"
+       ],
+       "paymentProviders": [
+        "cb",
+        "wallet",
+        "payment_token"
+       ],
+       "instalmentPercentage": null,
+       "prices": [
+        {
+         "id": "139a1a88-c165-4f28-96de-4a0a4943d2e5",
+         "duration": 1800,
+         "pricePerParticipant": 300,
+         "participantCount": 4,
+         "accompanyingAsGuestEnabled": null,
+         "autoCancellationDelay": null,
+         "instalmentAmount": null,
+         "bookable": true
+        },
+        {
+         "id": "9c0d43da-1b1d-4f49-9120-e72fcd338f83",
+         "duration": 5400,
+         "pricePerParticipant": 900,
+         "participantCount": 4,
+         "accompanyingAsGuestEnabled": null,
+         "autoCancellationDelay": null,
+         "instalmentAmount": null,
+         "bookable": true
+        },
+        {
+         "id": "b3124970-bf44-4f1a-8ef6-b76614d123a8",
+         "duration": 3600,
+         "pricePerParticipant": 600,
+         "participantCount": 4,
+         "accompanyingAsGuestEnabled": null,
+         "autoCancellationDelay": null,
+         "instalmentAmount": null,
+         "bookable": true
+        },
+        {
+         "id": "c8142543-0ab3-4fad-bb25-eccdecd93fff",
+         "duration": 7200,
+         "pricePerParticipant": 1200,
+         "participantCount": 4,
+         "accompanyingAsGuestEnabled": null,
+         "autoCancellationDelay": null,
+         "instalmentAmount": null,
+         "bookable": true
+        }
+       ],
+       "userClientStepBookingDuration": 1800
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "@type": "ClubPlayground",
+   "@id": "/clubs/playgrounds/4a47a51a-4f6b-4fce-8e54-e2d39304b155",
+   "id": "4a47a51a-4f6b-4fce-8e54-e2d39304b155",
+   "name": "Padel 2 Intérieur - Electro Rouhard à Verlaine ",
+   "bookingCancellationConditionType": "soft",
+   "bookingCancellationConditionCustomHours": null,
+   "indoor": true,
+   "enlightened": null,
+   "surface": "/surfaces/494bbae8-4c4d-4f76-a8f4-05c03481a223",
+   "closures": [],
+   "activities": [
+    {
+     "id": "73394a20-708e-4ffc-b555-977ed52b7327",
+     "name": "Padel intérieur",
+     "slots": [
+      {
+       "startAt": "06:00",
+       "paymentMethods": [
+        "complete",
+        "per_participant"
+       ],
+       "paymentProviders": [
+        "cb",
+        "wallet",
+        "payment_token"
+       ],
+       "instalmentPercentage": null,
+       "prices": [
+        {
+         "id": "139a1a88-c165-4f28-96de-4a0a4943d2e5",
+         "duration": 1800,
+         "pricePerParticipant": 300,
+         "participantCount": 4,
+         "accompanyingAsGuestEnabled": null,
+         "autoCancellationDelay": null,
+         "instalmentAmount": null,
+         "bookable": true
+        },
+        {
+         "id": "9c0d43da-1b1d-4f49-9120-e72fcd338f83",
+         "duration": 5400,
+         "pricePerParticipant": 900,
+         "participantCount": 4,
+         "accompanyingAsGuestEnabled": null,
+         "autoCancellationDelay": null,
+         "instalmentAmount": null,
+         "bookable": true
+        },
+        {
+         "id": "b3124970-bf44-4f1a-8ef6-b76614d123a8",
+         "duration": 3600,
+         "pricePerParticipant": 600,
+         "participantCount": 4,
+         "accompanyingAsGuestEnabled": null,
+         "autoCancellationDelay": null,
+         "instalmentAmount": null,
+         "bookable": true
+        },
+        {
+         "id": "c8142543-0ab3-4fad-bb25-eccdecd93fff",
+         "duration": 7200,
+         "pricePerParticipant": 1200,
+         "participantCount": 4,
+         "accompanyingAsGuestEnabled": null,
+         "autoCancellationDelay": null,
+         "instalmentAmount": null,
+         "bookable": true
+        }
+       ],
+       "userClientStepBookingDuration": 1800
+      },
+      {
+       "startAt": "06:30",
+       "paymentMethods": [
+        "complete",
+        "per_participant"
+       ],
+       "paymentProviders": [
+        "cb",
+        "wallet",
+        "payment_token"
+       ],
+       "instalmentPercentage": null,
+       "prices": [
+        {
+         "id": "139a1a88-c165-4f28-96de-4a0a4943d2e5",
+         "duration": 1800,
+         "pricePerParticipant": 300,
+         "participantCount": 4,
+         "accompanyingAsGuestEnabled": null,
+         "autoCancellationDelay": null,
+         "instalmentAmount": null,
+         "bookable": true
+        },
+        {
+         "id": "9c0d43da-1b1d-4f49-9120-e72fcd338f83",
+         "duration": 5400,
+         "pricePerParticipant": 900,
+         "participantCount": 4,
+         "accompanyingAsGuestEnabled": null,
+         "autoCancellationDelay": null,
+         "instalmentAmount": null,
+         "bookable": true
+        },
+        {
+         "id": "b3124970-bf44-4f1a-8ef6-b76614d123a8",
+         "duration": 3600,
+         "pricePerParticipant": 600,
+         "participantCount": 4,
+         "accompanyingAsGuestEnabled": null,
+         "autoCancellationDelay": null,
+         "instalmentAmount": null,
+         "bookable": true
+        },
+        {
+         "id": "c8142543-0ab3-4fad-bb25-eccdecd93fff",
+         "duration": 7200,
+         "pricePerParticipant": 1200,
+         "participantCount": 4,
+         "accompanyingAsGuestEnabled": null,
+         "autoCancellationDelay": null,
+         "instalmentAmount": null,
+         "bookable": true
+        }
+       ],
+       "userClientStepBookingDuration": 1800
+      },
+      {
+       "startAt": "07:00",
+       "paymentMethods": [
+        "complete",
+        "per_participant"
+       ],
+       "paymentProviders": [
+        "cb",
+        "wallet",
+        "payment_token"
+       ],
+       "instalmentPercentage": null,
+       "prices": [
+        {
+         "id": "139a1a88-c165-4f28-96de-4a0a4943d2e5",
+         "duration": 1800,
+         "pricePerParticipant": 300,
+         "participantCount": 4,
+         "accompanyingAsGuestEnabled": null,
+         "autoCancellationDelay": null,
+         "instalmentAmount": null,
+         "bookable": true
+        },
+        {
+         "id": "9c0d43da-1b1d-4f49-9120-e72fcd338f83",
+         "duration": 5400,
+         "pricePerParticipant": 900,
+         "participantCount": 4,
+         "accompanyingAsGuestEnabled": null,
+         "autoCancellationDelay": null,
+         "instalmentAmount": null,
+         "bookable": true
+        },
+        {
+         "id": "b3124970-bf44-4f1a-8ef6-b76614d123a8",
+         "duration": 3600,
+         "pricePerParticipant": 600,
+         "participantCount": 4,
+         "accompanyingAsGuestEnabled": null,
+         "autoCancellationDelay": null,
+         "instalmentAmount": null,
+         "bookable": true
+        },
+        {
+         "id": "c8142543-0ab3-4fad-bb25-eccdecd93fff",
+         "duration": 7200,
+         "pricePerParticipant": 1200,
+         "participantCount": 4,
+         "accompanyingAsGuestEnabled": null,
+         "autoCancellationDelay": null,
+         "instalmentAmount": null,
+         "bookable": true
+        }
+       ],
+       "userClientStepBookingDuration": 1800
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "hydra:totalItems": 9,
+ "hydra:view": {
+  "@id": "/clubs/playgrounds/plannings/2026-10-01?club.id=4eff1248-6a6f-4f81-8233-69723c720f99&from=00%3A00&to=23%3A59%3A59&activities.id=73394a20-708e-4ffc-b555-977ed52b7327&bookingType=unique",
+  "@type": "hydra:PartialCollectionView"
+ },
+ "hydra:search": {
+  "@type": "hydra:IriTemplate",
+  "hydra:template": "/clubs/playgrounds/plannings/2026-10-01{?id,id[],name,club.id,club.id[],surface.id,surface.id[],activities.id,activities.id[],bookingType,bookingType[],order[position],order[name],enabled,indoor,enlightened}",
+  "hydra:variableRepresentation": "BasicRepresentation",
+  "hydra:mapping": [
+   {
+    "@type": "IriTemplateMapping",
+    "variable": "id",
+    "property": "id",
+    "required": false
+   },
+   {
+    "@type": "IriTemplateMapping",
+    "variable": "id[]",
+    "property": "id",
+    "required": false
+   },
+   {
+    "@type": "IriTemplateMapping",
+    "variable": "name",
+    "property": "name",
+    "required": false
+   },
+   {
+    "@type": "IriTemplateMapping",
+    "variable": "club.id",
+    "property": "club.id",
+    "required": false
+   },
+   {
+    "@type": "IriTemplateMapping",
+    "variable": "club.id[]",
+    "property": "club.id",
+    "required": false
+   },
+   {
+    "@type": "IriTemplateMapping",
+    "variable": "surface.id",
+    "property": "surface.id",
+    "required": false
+   },
+   {
+    "@type": "IriTemplateMapping",
+    "variable": "surface.id[]",
+    "property": "surface.id",
+    "required": false
+   },
+   {
+    "@type": "IriTemplateMapping",
+    "variable": "activities.id",
+    "property": "activities.id",
+    "required": false
+   },
+   {
+    "@type": "IriTemplateMapping",
+    "variable": "activities.id[]",
+    "property": "activities.id",
+    "required": false
+   },
+   {
+    "@type": "IriTemplateMapping",
+    "variable": "bookingType",
+    "property": "bookingType",
+    "required": false
+   },
+   {
+    "@type": "IriTemplateMapping",
+    "variable": "bookingType[]",
+    "property": "bookingType",
+    "required": false
+   },
+   {
+    "@type": "IriTemplateMapping",
+    "variable": "order[position]",
+    "property": "position",
+    "required": false
+   },
+   {
+    "@type": "IriTemplateMapping",
+    "variable": "order[name]",
+    "property": "name",
+    "required": false
+   },
+   {
+    "@type": "IriTemplateMapping",
+    "variable": "enabled",
+    "property": "enabled",
+    "required": false
+   },
+   {
+    "@type": "IriTemplateMapping",
+    "variable": "indoor",
+    "property": "indoor",
+    "required": false
+   },
+   {
+    "@type": "IriTemplateMapping",
+    "variable": "enlightened",
+    "property": "enlightened",
+    "required": false
+   }
+  ]
+ }
+}

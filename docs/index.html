@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Padel Liège</title>
+<meta name="description" content="Créneaux de padel libres autour de Liège, sur 7 jours.">
+<meta name="theme-color" content="#0f1b2d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Padel">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icones/icone-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icones/icone-180.png">
+<style>
+:root {
+  --fond: #f3f5f8;
+  --carte: #ffffff;
+  --texte: #142033;
+  --doux: #5c6b80;
+  --ligne: #dfe4ec;
+  --accent: #0f1b2d;
+  --balle: #c6ef3a;
+  --puce: #eef3e0;
+  --puce-texte: #25400a;
+  --alerte: #b54708;
+  --alerte-fond: #fff4e5;
+  --erreur: #b42318;
+  --ombre: 0 1px 2px rgba(15, 27, 45, .06), 0 2px 8px rgba(15, 27, 45, .05);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --fond: #0b1320;
+    --carte: #141f31;
+    --texte: #e8edf5;
+    --doux: #93a1b5;
+    --ligne: #243249;
+    --accent: #c6ef3a;
+    --puce: #22321a;
+    --puce-texte: #d9f58a;
+    --alerte: #fdb022;
+    --alerte-fond: #33240a;
+    --erreur: #f97066;
+    --ombre: none;
+    color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--fond); color: var(--texte);
+  font: 16px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  padding-bottom: calc(24px + env(safe-area-inset-bottom));
+}
+button, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+
+/* En-tête */
+header {
+  position: sticky; top: 0; z-index: 5;
+  background: #0f1b2d; color: #fff;
+  padding: calc(10px + env(safe-area-inset-top)) 16px 10px;
+}
+.titre { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+h1 { font-size: 20px; margin: 0; letter-spacing: -.01em; display: flex; align-items: center; gap: 8px; }
+h1::before { content: ""; width: 14px; height: 14px; border-radius: 50%; background: var(--balle); box-shadow: inset -3px -2px 0 rgba(0,0,0,.15); }
+#etat {
+  background: rgba(255,255,255,.1); border: 0; border-radius: 999px;
+  padding: 5px 11px; font-size: 13px; color: #dbe3ee; white-space: nowrap;
+}
+#etat.alerte { background: #7a2e0e; color: #ffe2c2; }
+#jours { display: flex; gap: 6px; overflow-x: auto; margin: 10px -16px 0; padding: 0 16px 2px; scrollbar-width: none; }
+#jours::-webkit-scrollbar { display: none; }
+.jour {
+  flex: 0 0 auto; min-width: 54px; border: 0; border-radius: 12px; padding: 6px 8px;
+  background: rgba(255,255,255,.08); color: #cdd6e3; text-align: center; line-height: 1.15;
+}
+.jour b { display: block; font-size: 18px; color: #fff; }
+.jour small { font-size: 12px; }
+.jour[aria-pressed="true"] { background: var(--balle); color: #1b2a06; }
+.jour[aria-pressed="true"] b { color: #0f1b2d; }
+
+/* Filtres */
+#filtres { padding: 10px 16px 2px; display: grid; gap: 8px; }
+.rangee { display: flex; gap: 6px; align-items: center; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+.rangee::-webkit-scrollbar { display: none; }
+.etiquette { font-size: 13px; color: var(--doux); min-width: 50px; flex: 0 0 auto; }
+.choix {
+  border: 1px solid var(--ligne); background: var(--carte); border-radius: 999px;
+  padding: 5px 11px; font-size: 14px; flex: 0 0 auto; white-space: nowrap;
+}
+.choix[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--fond); font-weight: 600; }
+select {
+  border: 1px solid var(--ligne); background: var(--carte); border-radius: 10px; padding: 5px 6px; font-size: 14px;
+}
+#bouton-clubs { margin-left: auto; }
+.heure small { display: block; white-space: nowrap; }
+
+/* Résultats */
+main { padding: 6px 16px; display: grid; gap: 12px; }
+#resume { font-size: 13px; color: var(--doux); padding: 0 2px; }
+.club { background: var(--carte); border-radius: 16px; padding: 14px; box-shadow: var(--ombre); border: 1px solid var(--ligne); }
+.club-tete { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.club h2 { font-size: 16px; margin: 0; }
+.commune { font-size: 13px; color: var(--doux); }
+.badge-ancien { margin-top: 6px; font-size: 12.5px; color: var(--alerte); background: var(--alerte-fond); border-radius: 8px; padding: 4px 8px; display: inline-block; }
+.heures { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 8px; margin-top: 12px; }
+.heure {
+  border: 0; border-radius: 12px; padding: 8px 4px; background: var(--puce); color: var(--puce-texte);
+  text-align: center; line-height: 1.15;
+}
+.heure b { display: block; font-size: 17px; font-variant-numeric: tabular-nums; }
+.heure small { font-size: 11px; opacity: .85; }
+.vide { font-size: 13px; color: var(--doux); padding: 4px 2px 12px; }
+.message { text-align: center; color: var(--doux); padding: 32px 16px; }
+
+/* Feuilles (détail, clubs, état) */
+dialog {
+  border: 0; padding: 0; width: 100%; max-width: 560px; margin: auto auto 0; border-radius: 20px 20px 0 0;
+  background: var(--carte); color: var(--texte); max-height: 85vh;
+}
+dialog::backdrop { background: rgba(5, 10, 20, .55); }
+.feuille { padding: 18px 16px calc(18px + env(safe-area-inset-bottom)); overflow-y: auto; max-height: 85vh; }
+.feuille h3 { margin: 0 0 2px; font-size: 18px; }
+.feuille .sous { color: var(--doux); font-size: 14px; margin-bottom: 12px; }
+.ligne-terrain { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--ligne); font-size: 15px; }
+.ligne-terrain span:last-child { color: var(--doux); text-align: right; white-space: nowrap; }
+.actions { display: flex; gap: 8px; margin-top: 16px; }
+.principal {
+  flex: 1; display: block; text-align: center; text-decoration: none; background: var(--balle); color: #14230a;
+  font-weight: 700; border-radius: 14px; padding: 13px; border: 0;
+}
+.secondaire { border: 1px solid var(--ligne); background: transparent; border-radius: 14px; padding: 12px 16px; }
+.liste-clubs label { display: flex; align-items: center; gap: 10px; padding: 10px 2px; border-top: 1px solid var(--ligne); }
+.liste-clubs input { width: 20px; height: 20px; accent-color: #5f8f0a; }
+.liste-clubs small { color: var(--doux); margin-left: auto; }
+.etat-club { padding: 10px 0; border-top: 1px solid var(--ligne); font-size: 14px; }
+.etat-club .ko { color: var(--erreur); }
+.etat-club .detail { color: var(--doux); font-size: 12.5px; word-break: break-word; }
+.note { font-size: 12.5px; color: var(--doux); margin-top: 14px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="titre">
+    <h1>Padel Liège</h1>
+    <button id="etat" type="button">Chargement…</button>
+  </div>
+  <div id="jours" role="group" aria-label="Jour"></div>
+</header>
+
+<section id="filtres" aria-label="Filtres">
+  <div class="rangee">
+    <span class="etiquette">Horaire</span>
+    <select id="de" aria-label="À partir de"></select>
+    <span class="etiquette" style="min-width:0">à</span>
+    <select id="a" aria-label="Jusqu'à"></select>
+    <button id="bouton-clubs" class="choix" type="button">Clubs</button>
+  </div>
+  <div class="rangee" id="durees" role="group" aria-label="Durée">
+    <span class="etiquette">Durée</span>
+  </div>
+  <div class="rangee" id="lieux" role="group" aria-label="Terrain">
+    <span class="etiquette">Terrain</span>
+  </div>
+</section>
+
+<main>
+  <div id="resume"></div>
+  <div id="resultats"><p class="message">Chargement des créneaux…</p></div>
+</main>
+
+<dialog id="feuille-detail"><div class="feuille" id="detail"></div></dialog>
+<dialog id="feuille-clubs"><div class="feuille">
+  <h3>Clubs affichés</h3>
+  <div class="actions" style="margin:8px 0 10px">
+    <button class="secondaire" type="button" id="clubs-tous">Tous</button>
+    <button class="secondaire" type="button" id="clubs-aucun">Aucun</button>
+  </div>
+  <div class="liste-clubs" id="liste-clubs"></div>
+  <div class="actions"><button class="principal" type="button" id="clubs-ok">Valider</button></div>
+</div></dialog>
+<dialog id="feuille-etat"><div class="feuille" id="etat-detail"></div></dialog>
+
+<script>
+"use strict";
+const DONNEES = "data/creneaux.json";
+const DUREES = [30, 60, 90, 120];
+const LIEUX = [["tous", "Tous"], ["int", "Intérieur"], ["ext", "Extérieur"]];
+const RETARD_ALERTE_MIN = 90; // au delà, on signale une collecte en panne
+const JOURS_COURTS = ["dim.", "lun.", "mar.", "mer.", "jeu.", "ven.", "sam."];
+const MOIS = ["janv.", "févr.", "mars", "avr.", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."];
+const PLATEFORMES = { doinsport: "Doinsport", playtomic: "Playtomic", sportfinder: "Sport-finder",
+  anybuddy: "Anybuddy", matchi: "MATCHi", bigcaptain: "Big Captain" };
+
+const $ = (s) => document.querySelector(s);
+const el = (tag, attrs = {}, ...enfants) => {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === "class") n.className = v; else if (k.startsWith("on")) n.addEventListener(k.slice(2), v);
+    else n.setAttribute(k, v);
+  }
+  for (const e of enfants) if (e != null) n.append(e);
+  return n;
+};
+
+// Préférences mémorisées sur ce téléphone (sans conséquence si le stockage est indisponible).
+function lirePrefs() { try { return JSON.parse(localStorage.getItem("padel-prefs")) || {}; } catch { return {}; } }
+function ecrirePrefs() {
+  try { localStorage.setItem("padel-prefs", JSON.stringify({ de: etat.de, a: etat.a, durees: [...etat.durees],
+    lieu: etat.lieu, masques: [...etat.masques] })); } catch {}
+}
+const prefs = lirePrefs();
+const etat = {
+  donnees: null, creneaux: [], clubs: new Map(), jour: null,
+  de: prefs.de ?? 6, a: prefs.a ?? 24,
+  durees: new Set(prefs.durees ?? [60, 90, 120]),
+  lieu: prefs.lieu ?? "tous",
+  masques: new Set(prefs.masques ?? []),
+  charge: 0,
+};
+
+// Heure de Bruxelles, quel que soit le fuseau du téléphone.
+function maintenantBxl() {
+  const p = Object.fromEntries(new Intl.DateTimeFormat("fr-BE", { timeZone: "Europe/Brussels",
+    year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23" })
+    .formatToParts(new Date()).map((x) => [x.type, x.value]));
+  return { date: `${p.year}-${p.month}-${p.day}`, heure: `${p.hour}:${p.minute}` };
+}
+function nomJour(iso, long = false) {
+  const d = new Date(iso + "T12:00:00");
+  const auj = maintenantBxl().date;
+  const demain = new Date(auj + "T12:00:00"); demain.setDate(demain.getDate() + 1);
+  if (iso === auj) return "Aujourd'hui";
+  if (iso === demain.toISOString().slice(0, 10)) return "Demain";
+  return long ? `${JOURS_COURTS[d.getDay()]} ${d.getDate()} ${MOIS[d.getMonth()]}` : JOURS_COURTS[d.getDay()];
+}
+function depuis(iso) {
+  if (!iso) return "jamais";
+  const min = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
+  if (min < 1) return "à l'instant";
+  if (min < 60) return `il y a ${min} min`;
+  const h = Math.floor(min / 60);
+  if (h < 24) return `il y a ${h} h${min % 60 ? " " + String(min % 60).padStart(2, "0") : ""}`;
+  return `il y a ${Math.floor(h / 24)} j`;
+}
+function heureDe(iso) {
+  return new Date(iso).toLocaleTimeString("fr-BE", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Brussels" });
+}
+const texteDuree = (m) => m < 60 ? `${m} min` : `${Math.floor(m / 60)} h${m % 60 ? " " + String(m % 60).padStart(2, "0") : ""}`;
+const euros = (x) => x == null ? "" : `${Number.isInteger(x) ? x : x.toFixed(2).replace(".", ",")} €`;
+
+async function charger() {
+  try {
+    const r = await fetch(`${DONNEES}?t=${Date.now()}`, { cache: "no-store" });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const d = await r.json();
+    const col = d.colonnes;
+    etat.donnees = d;
+    etat.clubs = new Map(d.clubs.map((c) => [c.id, c]));
+    etat.creneaux = d.creneaux.map((l) => {
+      const c = {}; col.forEach((k, i) => (c[k] = l[i])); c.lien = d.liens[c.lien]; return c;
+    });
+    etat.charge = Date.now();
+    const jours = [...new Set(d.jours)];
+    const auj = maintenantBxl().date;
+    if (!etat.jour || !jours.includes(etat.jour) || etat.jour < auj) etat.jour = jours.find((j) => j >= auj) || jours[0];
+    dessinerTout();
+  } catch (e) {
+    $("#etat").textContent = "Hors ligne";
+    $("#etat").classList.add("alerte");
+    if (!etat.donnees) $("#resultats").replaceChildren(el("p", { class: "message" },
+      "Impossible de charger les créneaux. Vérifiez la connexion puis rouvrez la page."));
+  }
+}
+
+function dessinerTout() { dessinerEtat(); dessinerJours(); dessinerFiltres(); dessinerResultats(); }
+
+function dessinerEtat() {
+  const d = etat.donnees, clubs = d.clubs;
+  const ko = clubs.filter((c) => c.statut !== "ok");
+  const retard = (Date.now() - new Date(d.genere_le).getTime()) / 60000 > RETARD_ALERTE_MIN;
+  const b = $("#etat");
+  b.textContent = ko.length ? `${ko.length} club${ko.length > 1 ? "s" : ""} pas à jour` :
+    retard ? `Mis à jour ${depuis(d.genere_le)}` : `À jour, ${heureDe(d.genere_le)}`;
+  b.classList.toggle("alerte", ko.length > 0 || retard);
+}
+
+function dessinerJours() {
+  const auj = maintenantBxl().date;
+  const conteneur = $("#jours");
+  conteneur.replaceChildren(...etat.donnees.jours.filter((j) => j >= auj).map((j) => {
+    const d = new Date(j + "T12:00:00");
+    return el("button", { class: "jour", type: "button", "aria-pressed": String(j === etat.jour),
+      onclick: () => { etat.jour = j; dessinerJours(); dessinerResultats(); } },
+      el("small", {}, j === auj ? "auj." : JOURS_COURTS[d.getDay()]), el("b", {}, String(d.getDate())));
+  }));
+}
+
+function dessinerFiltres() {
+  const de = $("#de"), a = $("#a");
+  if (!de.options.length) {
+    for (let h = 6; h <= 23; h++) de.append(new Option(`${h} h`, h));
+    for (let h = 7; h <= 24; h++) a.append(new Option(h === 24 ? "minuit" : `${h} h`, h));
+    de.onchange = () => { etat.de = +de.value; if (etat.a <= etat.de) etat.a = etat.de + 1; majFiltres(); };
+    a.onchange = () => { etat.a = +a.value; if (etat.de >= etat.a) etat.de = etat.a - 1; majFiltres(); };
+  }
+  de.value = etat.de; a.value = etat.a;
+
+  const zd = $("#durees");
+  zd.querySelectorAll("button").forEach((b) => b.remove());
+  for (const d of DUREES) zd.append(el("button", { class: "choix", type: "button", "aria-pressed": String(etat.durees.has(d)),
+    onclick: () => { etat.durees.has(d) ? etat.durees.delete(d) : etat.durees.add(d); majFiltres(); } }, texteDuree(d)));
+
+  const zl = $("#lieux");
+  zl.querySelectorAll("button").forEach((b) => b.remove());
+  for (const [k, t] of LIEUX) zl.append(el("button", { class: "choix", type: "button", "aria-pressed": String(etat.lieu === k),
+    onclick: () => { etat.lieu = k; majFiltres(); } }, t));
+
+  const visibles = etat.donnees.clubs.filter((c) => !etat.masques.has(c.id)).length;
+  $("#bouton-clubs").textContent = visibles === etat.donnees.clubs.length ? "Clubs" : `${visibles} club${visibles > 1 ? "s" : ""}`;
+  $("#bouton-clubs").setAttribute("aria-pressed", String(visibles !== etat.donnees.clubs.length));
+}
+function majFiltres() { ecrirePrefs(); dessinerFiltres(); dessinerResultats(); }
+
+function filtrer() {
+  const n = maintenantBxl();
+  const de = `${String(etat.de).padStart(2, "0")}:00`, a = etat.a === 24 ? "24:00" : `${String(etat.a).padStart(2, "0")}:00`;
+  return etat.creneaux.filter((c) =>
+    c.date === etat.jour && c.heure >= de && c.heure < a &&
+    !(c.date === n.date && c.heure < n.heure) &&
+    etat.durees.has(c.duree_min) && !etat.masques.has(c.club) &&
+    (etat.lieu === "tous" || (etat.lieu === "int" ? c.interieur === true : c.interieur === false)));
+}
+
+function dessinerResultats() {
+  const liste = filtrer();
+  const parClub = new Map();
+  for (const c of liste) {
+    if (!parClub.has(c.club)) parClub.set(c.club, new Map());
+    const h = parClub.get(c.club);
+    if (!h.has(c.heure)) h.set(c.heure, []);
+    h.get(c.heure).push(c);
+  }
+  const zone = $("#resultats");
+  if (!etat.durees.size) {
+    zone.replaceChildren(el("p", { class: "message" }, "Choisissez au moins une durée."));
+    $("#resume").textContent = ""; return;
+  }
+  const cartes = [];
+  let nbHeures = 0;
+  for (const club of etat.donnees.clubs) {
+    const heures = parClub.get(club.id);
+    if (!heures) continue;
+    const triees = [...heures.keys()].sort();
+    nbHeures += triees.length;
+    cartes.push(el("article", { class: "club" },
+      el("div", { class: "club-tete" }, el("h2", {}, club.nom), el("span", { class: "commune" }, club.commune)),
+      club.statut !== "ok" ? el("div", { class: "badge-ancien" },
+        `Pas actualisé depuis ${club.derniere_maj_ok ? depuis(club.derniere_maj_ok).replace("il y a ", "") : "le début"} : à vérifier sur le site`) : null,
+      el("div", { class: "heures" }, ...triees.map((h) => {
+        const cr = heures.get(h);
+        const terrains = new Set(cr.map((c) => c.terrain)).size;
+        const durees = [...new Set(cr.map((c) => c.duree_min))].sort((x, y) => x - y);
+        return el("button", { class: "heure", type: "button", onclick: () => ouvrirDetail(club, h, cr) },
+          el("b", {}, h), el("small", {}, `${terrains} terr. · ${durees.join("/")}′`));
+      }))));
+  }
+  const sansCreneau = etat.donnees.clubs.filter((c) => !parClub.has(c.id) && !etat.masques.has(c.id));
+  $("#resume").textContent = liste.length
+    ? `${nomJour(etat.jour, true)} : ${nbHeures} horaire${nbHeures > 1 ? "s" : ""} libre${nbHeures > 1 ? "s" : ""} dans ${cartes.length} club${cartes.length > 1 ? "s" : ""}`
+    : "";
+  if (!cartes.length) cartes.push(el("p", { class: "message" }, "Aucun créneau libre avec ces filtres. Essayez un autre jour ou élargissez l'horaire."));
+  else if (sansCreneau.length) cartes.push(el("p", { class: "vide" }, `Rien de libre : ${sansCreneau.map((c) => c.nom).join(", ")}.`));
+  zone.replaceChildren(...cartes);
+}
+
+function ouvrirDetail(club, heure, cr) {
+  const parTerrain = new Map();
+  for (const c of cr) {
+    if (!parTerrain.has(c.terrain)) parTerrain.set(c.terrain, []);
+    parTerrain.get(c.terrain).push(c);
+  }
+  const lieu = (v) => v === true ? "intérieur" : v === false ? "extérieur" : "";
+  const lien = cr[0].lien;
+  const prefill = /[?&]date=/.test(lien);
+  $("#detail").replaceChildren(
+    el("h3", {}, `${club.nom}, ${heure}`),
+    el("div", { class: "sous" }, `${nomJour(etat.jour, true)} · ${club.commune}`),
+    ...[...parTerrain.entries()].sort().map(([t, lst]) => el("div", { class: "ligne-terrain" },
+      el("span", {}, t, lieu(lst[0].interieur) ? el("small", { class: "commune" }, ` · ${lieu(lst[0].interieur)}`) : null),
+      el("span", {}, lst.sort((x, y) => x.duree_min - y.duree_min)
+        .map((c) => `${texteDuree(c.duree_min)}${c.prix_eur != null ? ` (${euros(c.prix_eur)})` : ""}`).join(" · ")))),
+    el("div", { class: "actions" },
+      el("a", { class: "principal", href: lien, target: "_blank", rel: "noopener" }, `Réserver sur ${PLATEFORMES[club.plateforme] || "le site"}`),
+      el("button", { class: "secondaire", type: "button", onclick: () => $("#feuille-detail").close() }, "Fermer")),
+    el("p", { class: "note" }, prefill ? "Le lien ouvre le planning du club à cette date." :
+      `Le lien ouvre le planning du club : choisissez le ${nomJour(etat.jour, true).toLowerCase()} à ${heure}.`,
+      club.statut !== "ok" ? " Données anciennes : le créneau a peut-être été pris." : "",
+      " Prix indicatif, pour le terrain entier."));
+  $("#feuille-detail").showModal();
+}
+
+function ouvrirClubs() {
+  const zone = $("#liste-clubs");
+  const dessiner = () => zone.replaceChildren(...etat.donnees.clubs.map((c) => {
+    const cb = el("input", { type: "checkbox" });
+    cb.checked = !etat.masques.has(c.id);
+    cb.onchange = () => { cb.checked ? etat.masques.delete(c.id) : etat.masques.add(c.id); };
+    return el("label", {}, cb, c.nom, el("small", {}, c.commune));
+  }));
+  $("#clubs-tous").onclick = () => { etat.masques.clear(); dessiner(); };
+  $("#clubs-aucun").onclick = () => { etat.donnees.clubs.forEach((c) => etat.masques.add(c.id)); dessiner(); };
+  $("#clubs-ok").onclick = () => { $("#feuille-clubs").close(); };
+  dessiner();
+  $("#feuille-clubs").showModal();
+}
+$("#feuille-clubs").addEventListener("close", majFiltres);
+
+function ouvrirEtat() {
+  const d = etat.donnees;
+  if (!d) return;
+  const clubs = [...d.clubs].sort((x, y) => (x.statut === "ok") - (y.statut === "ok") || x.nom.localeCompare(y.nom));
+  $("#etat-detail").replaceChildren(
+    el("h3", {}, "État des clubs"),
+    el("div", { class: "sous" }, `Dernière collecte ${depuis(d.genere_le)} (${heureDe(d.genere_le)}). Actualisation toutes les 30 min environ.`),
+    ...clubs.map((c) => el("div", { class: "etat-club" },
+      el("div", {}, c.statut === "ok" ? "✓ " : el("span", { class: "ko" }, "✗ "), el("b", {}, c.nom),
+        ` · ${PLATEFORMES[c.plateforme] || c.plateforme}`),
+      el("div", { class: "detail" }, c.statut === "ok"
+        ? `À jour (${heureDe(c.derniere_maj_ok)}), ${c.nb_creneaux} créneaux`
+        : `Dernière mise à jour réussie : ${c.derniere_maj_ok ? depuis(c.derniere_maj_ok) : "aucune"}. ${c.erreur || ""}`))),
+    el("p", { class: "note" }, "Sans réservation en ligne lisible (non affichés) : RTC Liège (padel bientôt), Royal Fayenbois, Elite Soccer & Padel, Tennissimo, TPC Haut-Clocher."),
+    el("div", { class: "actions" }, el("button", { class: "secondaire", type: "button", style: "flex:1",
+      onclick: () => $("#feuille-etat").close() }, "Fermer")));
+  $("#feuille-etat").showModal();
+}
+$("#etat").onclick = ouvrirEtat;
+$("#bouton-clubs").onclick = ouvrirClubs;
+for (const dlg of document.querySelectorAll("dialog"))
+  dlg.addEventListener("click", (e) => { if (e.target === dlg) dlg.close(); });
+
+// Recharge quand on revient sur la page (écran d'accueil), au plus toutes les 5 minutes.
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && Date.now() - etat.charge > 5 * 60000) charger();
+});
+setInterval(() => { if (etat.donnees) dessinerEtat(); }, 60000);
+
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+charger();
+</script>
+</body>
+</html>

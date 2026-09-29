@@ -1,0 +1,66 @@
+{
+ "@context": {
+  "@vocab": "https://www.sport-finder.com/api/docs?_format=jsonld#",
+  "hydra": "http://www.w3.org/ns/hydra/core#",
+  "resources": "ResultCollection/resources",
+  "mapped_by_resource": "ResultCollection/mapped_by_resource",
+  "keys": "ResultCollection/keys",
+  "results": "ResultCollection/results"
+ },
+ "@type": "ResultCollection",
+ "@id": "/api/.well-known/genid/21a99401a5aea3f7aba0",
+ "results": [
+  {
+   "@type": "Result",
+   "@id": "/api/.well-known/genid/23ed91941cae159bed96",
+   "start": "2026-10-01T09:00:00",
+   "end": "2026-10-01T10:00:00",
+   "duration": 60,
+   "resource": {
+    "@type": "Field",
+    "@id": "/api/fields/392",
+    "id": 392
+   },
+   "price": 16
+  },
+  {
+   "@type": "Result",
+   "@id": "/api/.well-known/genid/07bde38c6677f7c8e0fe",
+   "start": "2026-10-01T09:00:00",
+   "end": "2026-10-01T10:00:00",
+   "duration": 60,
+   "resource": {
+    "@type": "Field",
+    "@id": "/api/fields/393",
+    "id": 393
+   },
+   "price": 16
+  },
+  {
+   "@type": "Result",
+   "@id": "/api/.well-known/genid/9fa1df7c528ead4b4a0a",
+   "start": "2026-10-01T09:00:00",
+   "end": "2026-10-01T10:30:00",
+   "duration": 90,
+   "resource": {
+    "@type": "Field",
+    "@id": "/api/fields/392",
+    "id": 392
+   },
+   "price": 24
+  },
+  {
+   "@type": "Result",
+   "@id": "/api/.well-known/genid/c8dd10827274918500f8",
+   "start": "2026-10-01T09:00:00",
+   "end": "2026-10-01T10:30:00",
+   "duration": 90,
+   "resource": {
+    "@type": "Field",
+    "@id": "/api/fields/393",
+    "id": 393
+   },
+   "price": 24
+  }
+ ]
+}
