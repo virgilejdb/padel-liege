@@ -91,7 +91,10 @@ async function main() {
   const blob = await github("/git/blobs", "POST", { content: contenu, encoding: "base64" }, cle);
   const arbre = await github("/git/trees", "POST",
     { tree: [{ path: "envoi.json", mode: "100644", type: "blob", sha: blob.sha }] }, cle);
-  const commit = await github("/git/commits", "POST", { message: "Envoi iPhone", tree: arbre.sha, parents: [] }, cle);
+  // Signature avec l'adresse anonyme GitHub : sinon GitHub utilise l'e-mail principal du compte, visible publiquement.
+  const signature = { name: DEPOT.split("/")[0], email: `${DEPOT.split("/")[0]}@users.noreply.github.com` };
+  const commit = await github("/git/commits", "POST",
+    { message: "Envoi iPhone", tree: arbre.sha, parents: [], author: signature, committer: signature }, cle);
   await github("/git/refs/heads/telephone", "PATCH", { sha: commit.sha, force: true }, cle);
 
   // 4. Lancement de la mise à jour de la page, puis attente de sa fin.
