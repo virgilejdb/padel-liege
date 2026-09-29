@@ -137,18 +137,17 @@ Les clubs marqués `via=telephone` dans `config/clubs.csv` ne sont jamais interr
 
 1. Chaque collecte publie la liste des adresses à interroger : `data/telephone-requetes.json`.
 2. Le raccourci « Padel » de l'iPhone interroge ces adresses depuis le téléphone (environ 60 requêtes, moins d'une minute), puis dépose les réponses dans le fichier `envoi.gz` de la branche `telephone`.
-3. Ce dépôt déclenche l'Action, qui relit les réponses avec les adaptateurs habituels. La page est à jour 1 à 2 minutes plus tard.
+3. Le raccourci lance ensuite l'Action (mode « iPhone »), qui relit les réponses avec les adaptateurs habituels. La page est à jour 1 à 2 minutes plus tard.
 4. Les collectes suivantes réutilisent ce dernier envoi. La page indique « Relevé par l'iPhone il y a… » et propose le bouton **Actualiser depuis l'iPhone** quand il date de plus d'une heure.
 
 Les noms des terrains Playtomic viennent de `config/terrains_playtomic.json`, pour que le raccourci n'ait pas à télécharger les pages des clubs. Si un club Playtomic change ses terrains, lancez depuis votre ordinateur `py outils/terrains_playtomic.py`, puis commitez le fichier.
 
 ### Réglages à faire une fois sur GitHub
 
-- **Autoriser la branche `telephone` à publier la page** : *Settings*, puis *Environments*, puis *github-pages*. Sous *Deployment branches and tags*, cliquez sur *Add deployment branch or tag rule* et saisissez `telephone`.
 - **Clé d'accès pour le raccourci** : photo de profil, puis *Settings*, *Developer settings*, *Personal access tokens*, *Fine-grained tokens*, *Generate new token*.
   - Nom : `Raccourci Padel`. Expiration : 1 an.
   - *Repository access* : *Only select repositories*, puis `padel-liege`.
-  - *Permissions*, *Repository permissions*, *Contents* : **Read and write**. Rien d'autre.
+  - *Permissions*, *Repository permissions* : *Contents* **Read and write** (déposer l'envoi) et *Actions* **Read and write** (lancer la mise à jour). Rien d'autre.
   - Copiez la clé (elle commence par `github_pat_`). Elle ne va que dans le raccourci, jamais dans le dépôt.
 
 ### Construire le raccourci « Padel »
@@ -178,7 +177,10 @@ Dans l'application Raccourcis, créez un raccourci nommé exactement **Padel** (
     - `content` : *Texte encodé* (étape 10) ;
     - `sha` : *Valeur du dictionnaire* (étape 12) ;
     - `branch` : `telephone`.
-14. **Afficher la notification** : `Envoyé : la page sera à jour dans 1 à 2 minutes.`
+14. **Obtenir le contenu de l'URL** : `https://api.github.com/repos/virgilejdb/padel-liege/actions/workflows/collecte.yml/dispatches`. Méthode **POST**, les deux mêmes en-têtes, corps **JSON** :
+    - `ref` (texte) : `main` ;
+    - `inputs` (dictionnaire) contenant `iphone` (texte) : `true`.
+15. **Afficher la notification** : `Envoyé : la page sera à jour dans 1 à 2 minutes.`
 
 Pour le lancer : bouton **Actualiser depuis l'iPhone** de la page, widget Raccourcis, ou icône sur l'écran d'accueil (appui long sur le raccourci, *Partager*, *Sur l'écran d'accueil*). Ne partagez pas ce raccourci : il contient votre clé.
 

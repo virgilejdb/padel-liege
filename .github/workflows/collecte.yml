@@ -3,9 +3,14 @@ name: Collecte des créneaux
 on:
   schedule:
     - cron: "7,37 * * * *"   # toutes les 30 min (GitHub peut retarder de quelques minutes)
-  workflow_dispatch:          # bouton « Run workflow » pour relancer à la main
+  workflow_dispatch:          # bouton « Run workflow », ou appel du raccourci iPhone après son envoi
+    inputs:
+      iphone:
+        description: "Traiter seulement le dernier envoi iPhone (plus rapide)"
+        type: boolean
+        default: false
   push:
-    branches: [main, telephone]   # telephone : envoi du raccourci iPhone
+    branches: [main]
 
 permissions:
   contents: read
@@ -25,8 +30,6 @@ jobs:
       url: ${{ steps.deploiement.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: main   # le code est toujours pris sur main, même pour un envoi iPhone
 
       - uses: actions/setup-python@v5
         with:
@@ -55,7 +58,7 @@ jobs:
             options+=(--telephone "$RUNNER_TEMP/envoi.gz" --telephone-date "${{ steps.iphone.outputs.date }}")
           fi
           # Envoi iPhone : seulement ses clubs, les autres gardent leur état (page à jour en 1 à 2 min).
-          if [ "${{ github.ref }}" = "refs/heads/telephone" ]; then
+          if [ "${{ inputs.iphone }}" = "true" ]; then
             options+=(--seulement-telephone)
           fi
           python -m collecteur "${options[@]}"
