@@ -9,7 +9,7 @@ const DEPOT = "virgilejdb/padel-liege";
 const PAGE = "https://virgilejdb.github.io/padel-liege/";
 const API = `https://api.github.com/repos/${DEPOT}`;
 const NOM_CLE = "padel-liege-github";
-const ATTENTE_MAX_MS = 5 * 60 * 1000;
+const ATTENTE_MAX_MS = 90 * 1000; // la mise à jour seule prend environ 30 secondes
 
 const pause = (ms) => new Promise((fini) => Timer.schedule(ms, false, fini));
 
@@ -65,24 +65,32 @@ async function main() {
   const urls = envoi.requetes || [];
   if (!urls.length) throw new Error("La liste des adresses est vide.");
 
-  // 2. Interrogation depuis l'iPhone, une adresse à la fois.
+  // 2. Interrogation depuis l'iPhone : les sites en parallèle, mais une requête à la fois par site.
   const reponses = {};
   const echecs = [];
-  for (let i = 0; i < urls.length; i++) {
-    const url = urls[i];
+  const parSite = {};
+  for (const url of urls) {
     const site = url.split("/")[2];
-    try {
-      const q = new Request(url);
-      q.timeoutInterval = 20;
-      const texte = await q.loadString();
-      if (q.response.statusCode === 200) reponses[url] = texte.replace(/\s+/g, " ");
-      else echecs.push(`${site} : HTTP ${q.response.statusCode}`);
-    } catch (e) {
-      echecs.push(`${site} : ${e.message}`);
-    }
-    console.log(`${i + 1}/${urls.length} ${site}`);
-    await pause(250);
+    (parSite[site] = parSite[site] || []).push(url);
   }
+  let faites = 0;
+  async function interrogerSite(site, adresses) {
+    for (const url of adresses) {
+      try {
+        const q = new Request(url);
+        q.timeoutInterval = 20;
+        const texte = await q.loadString();
+        if (q.response.statusCode === 200) reponses[url] = texte.replace(/\s+/g, " ");
+        else echecs.push(`${site} : HTTP ${q.response.statusCode}`);
+      } catch (e) {
+        echecs.push(`${site} : ${e.message}`);
+      }
+      faites++;
+      console.log(`${faites}/${urls.length} ${site}`);
+      await pause(250);
+    }
+  }
+  await Promise.all(Object.keys(parSite).map((site) => interrogerSite(site, parSite[site])));
   if (!Object.keys(reponses).length) throw new Error(`Aucune réponse obtenue. ${echecs.slice(0, 3).join(" ; ")}`);
   envoi.reponses = reponses;
 
@@ -107,13 +115,20 @@ async function main() {
     console.error(e);
     lancee = false;
   }
+  // Si la mise à jour attend derrière une collecte automatique (5 min), on ne fait pas attendre l'utilisateur.
   let conclusion = null;
+  let enFile = false;
   while (lancee && Date.now() - depart < ATTENTE_MAX_MS) {
-    await pause(10000);
+    await pause(5000);
     const runs = await github("/actions/workflows/collecte.yml/runs?event=workflow_dispatch&per_page=1", "GET", null, cle);
     const run = runs.workflow_runs[0];
-    if (run && Date.parse(run.created_at) >= depart - 60000 && run.status === "completed") {
+    if (!run || Date.parse(run.created_at) < depart - 60000) continue; // pas encore visible
+    if (run.status === "completed") {
       conclusion = run.conclusion;
+      break;
+    }
+    if (["queued", "pending", "waiting"].includes(run.status) && Date.now() - depart > 15000) {
+      enFile = true;
       break;
     }
     console.log("Mise à jour de la page en cours…");
@@ -121,13 +136,14 @@ async function main() {
 
   const bilan = `${Object.keys(reponses).length} réponses sur ${urls.length} envoyées.` +
     (echecs.length ? `\n${echecs.length} échecs : ${[...new Set(echecs)].slice(0, 3).join(" ; ")}` : "");
-  const titre = !lancee ? "Envoi réussi"
+  const titre = !lancee || enFile ? "Envoi réussi"
     : conclusion === "success" ? "Page à jour"
     : conclusion ? "Échec de la mise à jour" : "Mise à jour encore en cours";
   const suite = !lancee
     ? "\nMise à jour immédiate refusée (permission « Actions » de la clé) : la page sera à jour à la prochaine collecte automatique, sous 30 minutes."
+    : enFile ? "\nUne collecte automatique est en cours : la page sera à jour d'ici 5 minutes environ."
     : conclusion === "success" ? "" : conclusion
-    ? "\nDétail dans l'onglet Actions du dépôt." : "\nLa page sera à jour dans quelques minutes.";
+    ? "\nDétail dans l'onglet Actions du dépôt." : "\nLa page sera à jour d'ici une minute.";
   if ((await message(titre, bilan + suite, ["Ouvrir la page", "Fermer"])) === 0) Safari.open(`${PAGE}?maj=${Date.now()}`);
 }
 
