@@ -95,10 +95,17 @@ async function main() {
   await github("/git/refs/heads/telephone", "PATCH", { sha: commit.sha, force: true }, cle);
 
   // 4. Lancement de la mise à jour de la page, puis attente de sa fin.
+  // Sans la permission « Actions » de la clé, l'envoi sera repris par la prochaine collecte automatique.
   const depart = Date.now();
-  await github("/actions/workflows/collecte.yml/dispatches", "POST", { ref: "main", inputs: { iphone: "true" } }, cle);
+  let lancee = true;
+  try {
+    await github("/actions/workflows/collecte.yml/dispatches", "POST", { ref: "main", inputs: { iphone: "true" } }, cle);
+  } catch (e) {
+    console.error(e);
+    lancee = false;
+  }
   let conclusion = null;
-  while (Date.now() - depart < ATTENTE_MAX_MS) {
+  while (lancee && Date.now() - depart < ATTENTE_MAX_MS) {
     await pause(10000);
     const runs = await github("/actions/workflows/collecte.yml/runs?event=workflow_dispatch&per_page=1", "GET", null, cle);
     const run = runs.workflow_runs[0];
@@ -111,9 +118,12 @@ async function main() {
 
   const bilan = `${Object.keys(reponses).length} réponses sur ${urls.length} envoyées.` +
     (echecs.length ? `\n${echecs.length} échecs : ${[...new Set(echecs)].slice(0, 3).join(" ; ")}` : "");
-  const titre = conclusion === "success" ? "Page à jour"
+  const titre = !lancee ? "Envoi réussi"
+    : conclusion === "success" ? "Page à jour"
     : conclusion ? "Échec de la mise à jour" : "Mise à jour encore en cours";
-  const suite = conclusion === "success" ? "" : conclusion
+  const suite = !lancee
+    ? "\nMise à jour immédiate refusée (permission « Actions » de la clé) : la page sera à jour à la prochaine collecte automatique, sous 30 minutes."
+    : conclusion === "success" ? "" : conclusion
     ? "\nDétail dans l'onglet Actions du dépôt." : "\nLa page sera à jour dans quelques minutes.";
   if ((await message(titre, bilan + suite, ["Ouvrir la page", "Fermer"])) === 0) Safari.open(`${PAGE}?maj=${Date.now()}`);
 }
