@@ -113,6 +113,15 @@ main { padding: 6px 16px; display: grid; gap: 12px; }
 }
 .heure b { display: block; font-size: 17px; font-variant-numeric: tabular-nums; }
 .heure small { font-size: 11px; opacity: .85; }
+.badge-iphone { margin-top: 6px; font-size: 12.5px; color: var(--doux); background: var(--fond); border-radius: 8px; padding: 4px 8px; display: inline-block; }
+.bandeau-iphone {
+  display: flex; align-items: center; gap: 10px; justify-content: space-between;
+  background: var(--carte); border: 1px dashed var(--ligne); border-radius: 14px; padding: 10px 12px; font-size: 13.5px;
+}
+.bouton-iphone {
+  flex: 0 0 auto; background: var(--accent); color: var(--fond); text-decoration: none; font-weight: 600;
+  border-radius: 999px; padding: 7px 12px; font-size: 13.5px; white-space: nowrap; display: inline-block;
+}
 .vide { font-size: 13px; color: var(--doux); padding: 4px 2px 12px; }
 .message { text-align: center; color: var(--doux); padding: 32px 16px; }
 
@@ -190,6 +199,8 @@ const DONNEES = "data/creneaux.json";
 const DUREES = [30, 60, 90, 120];
 const LIEUX = [["tous", "Tous"], ["int", "Intérieur"], ["ext", "Extérieur"]];
 const RETARD_ALERTE_MIN = 90; // au delà, on signale une collecte en panne
+const IPHONE_ANCIEN_MIN = 60; // au delà, on propose d'actualiser les clubs relevés par l'iPhone
+const RACCOURCI = "shortcuts://run-shortcut?name=" + encodeURIComponent("Padel");
 const JOURS_COURTS = ["dim.", "lun.", "mar.", "mer.", "jeu.", "ven.", "sam."];
 const MOIS = ["janv.", "févr.", "mars", "avr.", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."];
 const PLATEFORMES = { doinsport: "Doinsport", playtomic: "Playtomic", sportfinder: "Sport-finder",
@@ -278,9 +289,16 @@ async function charger() {
 
 function dessinerTout() { dessinerEtat(); dessinerJours(); dessinerFiltres(); dessinerResultats(); }
 
+// Clubs relevés par le raccourci iPhone (sites qui refusent les serveurs de GitHub).
+const parIphone = (c) => c.via === "telephone";
+const ageMin = (iso) => iso ? (Date.now() - new Date(iso).getTime()) / 60000 : Infinity;
+const iphoneAncien = (c) => parIphone(c) && ageMin(c.derniere_maj_ok) > IPHONE_ANCIEN_MIN;
+const enPanne = (c) => parIphone(c) ? c.statut === "erreur" : c.statut !== "ok";
+const boutonIphone = (texte = "Actualiser depuis l'iPhone") => el("a", { class: "bouton-iphone", href: RACCOURCI }, texte);
+
 function dessinerEtat() {
   const d = etat.donnees, clubs = d.clubs;
-  const ko = clubs.filter((c) => c.statut !== "ok");
+  const ko = clubs.filter(enPanne);
   const retard = (Date.now() - new Date(d.genere_le).getTime()) / 60000 > RETARD_ALERTE_MIN;
   const b = $("#etat");
   b.textContent = ko.length ? `${ko.length} club${ko.length > 1 ? "s" : ""} pas à jour` :
@@ -358,7 +376,8 @@ function dessinerResultats() {
     nbHeures += triees.length;
     cartes.push(el("article", { class: "club" },
       el("div", { class: "club-tete" }, el("h2", {}, club.nom), el("span", { class: "commune" }, club.commune)),
-      club.statut !== "ok" ? el("div", { class: "badge-ancien" },
+      iphoneAncien(club) ? el("div", { class: "badge-iphone" }, `Relevé par l'iPhone ${depuis(club.derniere_maj_ok)}`) :
+      enPanne(club) ? el("div", { class: "badge-ancien" },
         `Pas actualisé depuis ${club.derniere_maj_ok ? depuis(club.derniere_maj_ok).replace("il y a ", "") : "le début"} : à vérifier sur le site`) : null,
       el("div", { class: "heures" }, ...triees.map((h) => {
         const cr = heures.get(h);
@@ -368,11 +387,25 @@ function dessinerResultats() {
           el("b", {}, h), el("small", {}, `${terrains} terr. · ${durees.join("/")}′`));
       }))));
   }
-  const sansCreneau = etat.donnees.clubs.filter((c) => !parClub.has(c.id) && !etat.masques.has(c.id));
+  const visibles = etat.donnees.clubs.filter((c) => !etat.masques.has(c.id));
+  const jamaisReleves = visibles.filter((c) => parIphone(c) && !c.derniere_maj_ok);
+  const sansCreneau = visibles.filter((c) => !parClub.has(c.id) && !jamaisReleves.includes(c));
   $("#resume").textContent = liste.length
     ? `${nomJour(etat.jour, true)} : ${nbHeures} horaire${nbHeures > 1 ? "s" : ""} libre${nbHeures > 1 ? "s" : ""} dans ${cartes.length} club${cartes.length > 1 ? "s" : ""}`
     : "";
-  if (!cartes.length) cartes.push(el("p", { class: "message" }, "Aucun créneau libre avec ces filtres. Essayez un autre jour ou élargissez l'horaire."));
+
+  // Bandeau iPhone : visible quand les clubs relevés par l'iPhone datent de plus d'une heure.
+  const aActualiser = visibles.filter(iphoneAncien);
+  if (aActualiser.length) {
+    const plusRecent = aActualiser.map((c) => c.derniere_maj_ok).filter(Boolean).sort().pop();
+    cartes.unshift(el("div", { class: "bandeau-iphone" },
+      el("span", {}, plusRecent
+        ? `${aActualiser.length} clubs (Playtomic, Sport-finder, MATCHi) relevés par l'iPhone ${depuis(plusRecent)}.`
+        : `${aActualiser.length} clubs (Playtomic, Sport-finder, MATCHi) attendent un premier relevé par l'iPhone.`),
+      boutonIphone()));
+  }
+  if (cartes.length === (aActualiser.length ? 1 : 0))
+    cartes.push(el("p", { class: "message" }, "Aucun créneau libre avec ces filtres. Essayez un autre jour ou élargissez l'horaire."));
   else if (sansCreneau.length) cartes.push(el("p", { class: "vide" }, `Rien de libre : ${sansCreneau.map((c) => c.nom).join(", ")}.`));
   zone.replaceChildren(...cartes);
 }
@@ -398,7 +431,8 @@ function ouvrirDetail(club, heure, cr) {
       el("button", { class: "secondaire", type: "button", onclick: () => $("#feuille-detail").close() }, "Fermer")),
     el("p", { class: "note" }, prefill ? "Le lien ouvre le planning du club à cette date." :
       `Le lien ouvre le planning du club : choisissez le ${nomJour(etat.jour, true).toLowerCase()} à ${heure}.`,
-      club.statut !== "ok" ? " Données anciennes : le créneau a peut-être été pris." : "",
+      iphoneAncien(club) ? ` Relevé ${depuis(club.derniere_maj_ok)} : le créneau a peut-être été pris.` :
+      enPanne(club) ? " Données anciennes : le créneau a peut-être été pris." : "",
       " Prix indicatif, pour le terrain entier."));
   $("#feuille-detail").showModal();
 }
@@ -422,16 +456,23 @@ $("#feuille-clubs").addEventListener("close", majFiltres);
 function ouvrirEtat() {
   const d = etat.donnees;
   if (!d) return;
-  const clubs = [...d.clubs].sort((x, y) => (x.statut === "ok") - (y.statut === "ok") || x.nom.localeCompare(y.nom));
+  const rang = (c) => enPanne(c) ? 0 : parIphone(c) ? 1 : 2;
+  const clubs = [...d.clubs].sort((x, y) => rang(x) - rang(y) || x.nom.localeCompare(y.nom));
+  const detail = (c) => {
+    if (enPanne(c)) return `Dernière mise à jour réussie : ${c.derniere_maj_ok ? depuis(c.derniere_maj_ok) : "aucune"}. ${c.erreur || ""}`;
+    if (parIphone(c)) return c.derniere_maj_ok ? `Relevé par l'iPhone ${depuis(c.derniere_maj_ok)}, ${c.nb_creneaux} créneaux` : "En attente d'un premier relevé par l'iPhone";
+    return `À jour (${heureDe(c.derniere_maj_ok)}), ${c.nb_creneaux} créneaux`;
+  };
   $("#etat-detail").replaceChildren(
     el("h3", {}, "État des clubs"),
     el("div", { class: "sous" }, `Dernière collecte ${depuis(d.genere_le)} (${heureDe(d.genere_le)}). Actualisation toutes les 30 min environ.`),
+    d.clubs.some(parIphone) ? el("p", { class: "note", style: "margin-top:0" },
+      "Playtomic, Sport-finder et MATCHi refusent les serveurs de GitHub : leurs clubs sont relevés par le raccourci « Padel » de l'iPhone. ",
+      boutonIphone("Lancer le raccourci")) : null,
     ...clubs.map((c) => el("div", { class: "etat-club" },
-      el("div", {}, c.statut === "ok" ? "✓ " : el("span", { class: "ko" }, "✗ "), el("b", {}, c.nom),
+      el("div", {}, enPanne(c) ? el("span", { class: "ko" }, "✗ ") : parIphone(c) ? "📱 " : "✓ ", el("b", {}, c.nom),
         ` · ${PLATEFORMES[c.plateforme] || c.plateforme}`),
-      el("div", { class: "detail" }, c.statut === "ok"
-        ? `À jour (${heureDe(c.derniere_maj_ok)}), ${c.nb_creneaux} créneaux`
-        : `Dernière mise à jour réussie : ${c.derniere_maj_ok ? depuis(c.derniere_maj_ok) : "aucune"}. ${c.erreur || ""}`))),
+      el("div", { class: "detail" }, detail(c)))),
     el("p", { class: "note" }, "Sans réservation en ligne lisible (non affichés) : RTC Liège (padel bientôt), Royal Fayenbois, Elite Soccer & Padel, Tennissimo, TPC Haut-Clocher."),
     el("div", { class: "actions" }, el("button", { class: "secondaire", type: "button", style: "flex:1",
       onclick: () => $("#feuille-etat").close() }, "Fermer")));

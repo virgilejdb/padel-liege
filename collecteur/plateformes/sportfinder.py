@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from datetime import date
 
-from ..http import Client
+from ..http import Client, construire_url
 from ..modele import Creneau, nettoyer_nom
 
 PARAMETRES = ("produit", "centre", "slug")
@@ -55,22 +55,30 @@ def interpreter(reponse: dict, club_id: str, terrains: dict, lien: str) -> list[
     return creneaux
 
 
+def _terrains(p: dict) -> tuple[str, dict]:
+    return f"{SITE}/api/fields", {"center": p["centre"], "sports": PADEL, "product": p["produit"], "page": 1}
+
+
+def _disponibilites(p: dict, jour: date) -> tuple[str, dict]:
+    return f"{SITE}/api/field_rentals/{p['produit']}/availabilities", {"date": jour.isoformat(), "sport": PADEL}
+
+
+def requetes(club, jours: list[date]) -> list[str]:
+    """Adresses à interroger depuis l'iPhone."""
+    p = club.params
+    return [construire_url(*_terrains(p))] + [construire_url(*_disponibilites(p, j)) for j in jours]
+
+
 def collecter(club, jours: list[date], client: Client) -> list[Creneau]:
     p = club.params
     lien = lien_reservation(p["slug"], p["produit"])
     entetes = {**ENTETES, "Referer": lien}
-    terrains = lire_terrains(client.get_json(
-        f"{SITE}/api/fields",
-        params={"center": p["centre"], "sports": PADEL, "product": p["produit"], "page": 1},
-        entetes=entetes,
-    ))
+    url, params = _terrains(p)
+    terrains = lire_terrains(client.get_json(url, params=params, entetes=entetes))
     creneaux = []
     for jour in jours:
-        reponse = client.get_json(
-            f"{SITE}/api/field_rentals/{p['produit']}/availabilities",
-            params={"date": jour.isoformat(), "sport": PADEL},
-            entetes=entetes,
-        )
+        url, params = _disponibilites(p, jour)
+        reponse = client.get_json(url, params=params, entetes=entetes)
         if "results" not in reponse:
             raise ValueError(f"réponse inattendue (clés : {list(reponse)[:5]})")
         creneaux += interpreter(reponse, club.id, terrains, lien)

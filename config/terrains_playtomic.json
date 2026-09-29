@@ -1,0 +1,94 @@
+{
+ "9e7c9904-3cd0-461f-bab8-b7a030bdf2d7": {
+  "08e3f320-92b1-43df-b4f5-a2218b631278": {
+   "nom": "Terrain 1",
+   "interieur": true
+  },
+  "fe30d0c1-2575-40e3-84ad-5bcda7785aa0": {
+   "nom": "Terrain 2",
+   "interieur": true
+  },
+  "17fbac85-2821-4677-8ddf-dde7de27e706": {
+   "nom": "Terrain 3",
+   "interieur": true
+  },
+  "7ea7a610-f214-4282-a1ef-3efb37d1ac41": {
+   "nom": "Terrain 4",
+   "interieur": true
+  },
+  "a45df61a-b77d-4e25-8ccb-237380ef2164": {
+   "nom": "Terrain 5",
+   "interieur": true
+  },
+  "032cbff9-2cdb-498e-a067-2c15f0c56aac": {
+   "nom": "Terrain 6",
+   "interieur": true
+  },
+  "7fbdb147-6a36-4eea-9122-595ebdd89f93": {
+   "nom": "Terrain 7",
+   "interieur": true
+  },
+  "83d112b1-960d-4b66-9622-84442219689d": {
+   "nom": "Terrain 8",
+   "interieur": true
+  },
+  "b0e0355a-7f63-4c07-b1ce-c7ef7293f747": {
+   "nom": "Terrain 9",
+   "interieur": true
+  },
+  "d4549ee0-3c5e-484f-8500-6326781ffaf4": {
+   "nom": "Terrain 10",
+   "interieur": true
+  },
+  "5ece4476-bd1e-4cf8-9794-cd7445ed411c": {
+   "nom": "Terrain 11",
+   "interieur": true
+  }
+ },
+ "f7e16b1f-7829-4eb7-bc29-3f2132becb58": {
+  "0bb2724c-4fe8-4395-b5d5-c2a2350f8e26": {
+   "nom": "Panoramic 1",
+   "interieur": false
+  }
+ },
+ "6b99ad95-24cb-41e6-8e02-aeac1f365a7f": {
+  "f5753e99-bb43-437f-a9cf-05ec678b616e": {
+   "nom": "Awans T1 - Double",
+   "interieur": true
+  },
+  "5408e2e4-e27a-42ee-9f50-165ba6a1ddb1": {
+   "nom": "Awans T2 - Double",
+   "interieur": true
+  },
+  "945a50ad-ef85-408d-98af-2a6df303c6d9": {
+   "nom": "Awans T3 - Double",
+   "interieur": true
+  },
+  "d204e683-1d4c-4f91-a89e-d53c90c704b6": {
+   "nom": "Awans T4 - Simple",
+   "interieur": true
+  },
+  "808b2bae-f4bc-46b8-b3e1-9135f084348f": {
+   "nom": "Awans T5 - Simple",
+   "interieur": true
+  },
+  "9645ada5-028e-471c-8397-95d6f3ff2efe": {
+   "nom": "Awans T6 - Simple",
+   "interieur": true
+  }
+ },
+ "d6f0424a-0c91-4780-8e37-7daaa6ff68f5": {
+  "8e074160-216b-416c-abef-6ea401571840": {
+   "nom": "Padel 1",
+   "interieur": true
+  },
+  "08652446-d823-41ab-91e5-db72e61f1ead": {
+   "nom": "Padel 2",
+   "interieur": true
+  },
+  "9b222e95-a74d-4e34-a83f-676a5d709c10": {
+   "nom": "Padel 3",
+   "interieur": true
+  }
+ }
+}

@@ -3,25 +3,32 @@
     python -m collecteur                      tous les clubs, 7 jours
     python -m collecteur --clubs bayards      un ou plusieurs clubs (séparés par des virgules)
     python -m collecteur --jours 2 --apercu   sans écrire le JSON, affiche un résumé
+
+Les clubs marqués via=telephone ne sont jamais interrogés d'ici : leurs réponses arrivent
+du raccourci iPhone (option --telephone).
 """
 
 from __future__ import annotations
 
 import argparse
 import csv
+import gzip
+import io
 import json
 import logging
 import os
 import sys
+import tarfile
 import traceback
 import urllib.request
+import zipfile
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, replace
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from pathlib import Path
 
-from .http import Client
+from .http import Client, ClientRejoue
 from .modele import FUSEAU, Creneau, valider
 from .plateformes import PLATEFORMES
 
@@ -39,6 +46,10 @@ class Club:
     commune: str
     plateforme: str
     params: dict
+
+    @property
+    def via_telephone(self) -> bool:
+        return self.params.get("via") == "telephone"
 
 
 def lire_clubs(chemin: Path = CONFIG) -> list[Club]:
@@ -61,7 +72,7 @@ def lire_clubs(chemin: Path = CONFIG) -> list[Club]:
     return clubs
 
 
-def collecter_club(club: Club, jours, client: Client, maintenant: datetime) -> list[Creneau]:
+def collecter_club(club: Club, jours, client, maintenant: datetime) -> list[Creneau]:
     module = PLATEFORMES.get(club.plateforme)
     if module is None:
         raise ValueError(f"plateforme inconnue : {club.plateforme}")
@@ -120,12 +131,51 @@ def lire_precedent(source: str) -> dict:
         return {}
 
 
+def lire_envoi_telephone(chemin: Path | None) -> dict | None:
+    """Réponses récupérées par le raccourci iPhone : JSON brut, ou archive .gz, .tar.gz ou .zip
+    (selon ce que produit l'action « Créer une archive » de Raccourcis)."""
+    if not chemin or not chemin.exists():
+        return None
+    try:
+        brut = chemin.read_bytes()
+        if brut[:2] == b"\x1f\x8b":
+            brut = gzip.decompress(brut)
+        if brut[257:262] == b"ustar":
+            with tarfile.open(fileobj=io.BytesIO(brut)) as tar:
+                brut = next(tar.extractfile(m) for m in tar.getmembers() if m.isfile()).read()
+        elif brut[:2] == b"PK":
+            with zipfile.ZipFile(io.BytesIO(brut)) as z:
+                brut = z.read(next(n for n in z.namelist() if not n.endswith("/")))
+        envoi = json.loads(brut.decode("utf-8-sig"))
+        if not isinstance(envoi.get("reponses"), dict) or not envoi.get("jours"):
+            raise ValueError("clés « jours » et « reponses » attendues")
+        return envoi
+    except Exception as e:
+        log.error("envoi iPhone illisible (%s) : %s", chemin, e)
+        return None
+
+
+def ecrire_requetes_telephone(chemin: Path, clubs: list[Club], jours, horodatage: str):
+    """Liste des adresses que le raccourci iPhone doit interroger (publiée avec la page)."""
+    urls = []
+    for club in clubs:
+        if club.via_telephone:
+            urls += PLATEFORMES[club.plateforme].requetes(club, jours)
+    chemin.write_text(json.dumps({"genere_le": horodatage, "jours": [j.isoformat() for j in jours],
+                                  "requetes": urls}, ensure_ascii=False, indent=1), encoding="utf-8")
+    log.info("écrit : %s (%d adresses pour l'iPhone)", chemin, len(urls))
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="python -m collecteur")
     ap.add_argument("--clubs", help="identifiants de clubs, séparés par des virgules")
     ap.add_argument("--jours", type=int, default=7)
     ap.add_argument("--sortie", type=Path, default=SORTIE)
     ap.add_argument("--precedent", help="fichier ou URL du dernier JSON publié (par défaut : --sortie)")
+    ap.add_argument("--telephone", type=Path, help="fichier envoyé par le raccourci iPhone")
+    ap.add_argument("--telephone-date", help="heure de l'envoi iPhone (ISO), par défaut celle du fichier")
+    ap.add_argument("--seulement-telephone", action="store_true",
+                    help="ne traite que les clubs iPhone, les autres gardent leur dernier état")
     ap.add_argument("--apercu", action="store_true", help="affiche un résumé sans écrire le JSON")
     args = ap.parse_args(argv)
 
@@ -139,6 +189,8 @@ def main(argv=None) -> int:
         if inconnus:
             raise SystemExit(f"clubs inconnus : {inconnus}")
         clubs = [c for c in tous if c.id in voulus]
+    if args.seulement_telephone:
+        clubs = [c for c in clubs if c.via_telephone]
 
     maintenant = datetime.now(FUSEAU)
     horodatage = maintenant.isoformat(timespec="seconds")
@@ -152,13 +204,19 @@ def main(argv=None) -> int:
         if f"{c['date']}T{c['heure']}" >= maintenant_txt:
             creneaux_precedents[c["club"]].append(c)
 
+    envoi = lire_envoi_telephone(args.telephone)
+    date_envoi = None
+    if envoi:
+        brute = args.telephone_date or datetime.fromtimestamp(args.telephone.stat().st_mtime, FUSEAU).isoformat()
+        date_envoi = datetime.fromisoformat(brute).astimezone(FUSEAU).isoformat(timespec="seconds")
+        log.info("envoi iPhone du %s : %d réponses", date_envoi, len(envoi["reponses"]))
+
     resultats: dict[str, tuple] = {}
 
-    def traiter_plateforme(groupe: list[Club]):
-        client = Client()  # un client par plateforme : pauses respectées site par site
+    def traiter(groupe: list[Club], client, jours_groupe):
         for club in groupe:
             try:
-                cr = collecter_club(club, jours, client, maintenant)
+                cr = collecter_club(club, jours_groupe, client, maintenant)
                 resultats[club.id] = ("ok", cr, None)
                 log.info("%-18s %5d créneaux", club.id, len(cr))
             except Exception as e:  # une panne isolée ne doit pas arrêter les autres clubs
@@ -167,24 +225,36 @@ def main(argv=None) -> int:
                 log.debug(traceback.format_exc())
 
     par_plateforme = defaultdict(list)
+    par_telephone = []
     for c in clubs:
-        par_plateforme[c.plateforme].append(c)
+        if c.via_telephone:
+            par_telephone.append(c)
+        else:
+            par_plateforme[c.plateforme].append(c)
+    if envoi:
+        # Les clubs iPhone sont relus à partir des réponses envoyées, sans aucune requête d'ici.
+        traiter(par_telephone, ClientRejoue(envoi["reponses"]), [date.fromisoformat(j) for j in envoi["jours"]])
     with ThreadPoolExecutor(max_workers=len(par_plateforme) or 1) as pool:
-        list(pool.map(traiter_plateforme, par_plateforme.values()))
+        # un client par plateforme : pauses respectées site par site
+        list(pool.map(lambda g: traiter(g, Client(), jours), par_plateforme.values()))
 
     sortie_clubs, sortie_creneaux = [], []
     for club in tous:
         ancien = etat_precedent.get(club.id, {})
+        via = "telephone" if club.via_telephone else None
         if club.id not in resultats:
-            # Club non demandé dans cette exécution (--clubs) : on reprend l'état précédent tel quel.
-            if ancien:
-                sortie_clubs.append({**ancien, "nom": club.nom, "commune": club.commune})
+            # Club non demandé (--clubs), ou club iPhone sans envoi : on reprend l'état précédent.
+            if ancien or via:
+                base = ancien or {"plateforme": club.plateforme, "statut": "attente",
+                                  "derniere_maj_ok": None, "derniere_tentative": None, "erreur": None}
+                sortie_clubs.append({**base, "id": club.id, "nom": club.nom, "commune": club.commune,
+                                     "via": via, "nb_creneaux": len(creneaux_precedents.get(club.id, []))})
                 sortie_creneaux += creneaux_precedents.get(club.id, [])
             continue
         statut, cr, erreur = resultats[club.id]
         if statut == "ok":
             lignes = [c.en_dict() for c in cr]
-            maj = horodatage
+            maj = date_envoi if via else horodatage
         else:
             # On garde les derniers créneaux connus encore à venir ; la page les signale comme anciens.
             lignes = creneaux_precedents.get(club.id, [])
@@ -195,6 +265,7 @@ def main(argv=None) -> int:
             "nom": club.nom,
             "commune": club.commune,
             "plateforme": club.plateforme,
+            "via": via,
             "statut": statut,
             "derniere_maj_ok": maj,
             "derniere_tentative": horodatage,
@@ -207,7 +278,7 @@ def main(argv=None) -> int:
                "clubs": sortie_clubs, "colonnes": COLONNES, "liens": liens, "creneaux": lignes}
 
     nb_ok = sum(1 for s, _, _ in resultats.values() if s == "ok")
-    log.info("%d/%d clubs actualisés, %d créneaux au total", nb_ok, len(clubs), len(sortie_creneaux))
+    log.info("%d/%d clubs actualisés, %d créneaux au total", nb_ok, len(resultats), len(sortie_creneaux))
 
     if args.apercu:
         for c in sortie_creneaux[:15]:
@@ -218,9 +289,10 @@ def main(argv=None) -> int:
         tmp.write_text(json.dumps(donnees, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
         os.replace(tmp, args.sortie)
         log.info("écrit : %s (%d Ko)", args.sortie, args.sortie.stat().st_size // 1024)
+        ecrire_requetes_telephone(args.sortie.parent / "telephone-requetes.json", tous, jours, horodatage)
 
-    # Échec du processus seulement si aucun club n'a pu être actualisé.
-    return 0 if nb_ok or not clubs else 1
+    # Échec du processus seulement si aucun club interrogé n'a pu être actualisé.
+    return 0 if nb_ok or not resultats else 1
 
 
 if __name__ == "__main__":

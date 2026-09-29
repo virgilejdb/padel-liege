@@ -5,8 +5,7 @@ on:
     - cron: "7,37 * * * *"   # toutes les 30 min (GitHub peut retarder de quelques minutes)
   workflow_dispatch:          # bouton « Run workflow » pour relancer à la main
   push:
-    branches: [main]
-    paths: ["collecteur/**", "config/**", "docs/**", "tests/**", ".github/workflows/collecte.yml"]
+    branches: [main, telephone]   # telephone : envoi du raccourci iPhone
 
 permissions:
   contents: read
@@ -26,6 +25,8 @@ jobs:
       url: ${{ steps.deploiement.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main   # le code est toujours pris sur main, même pour un envoi iPhone
 
       - uses: actions/setup-python@v5
         with:
@@ -37,8 +38,27 @@ jobs:
       - id: pages
         uses: actions/configure-pages@v5
 
-      - name: Collecte (7 jours, tous les clubs)
-        run: python -m collecteur --precedent "${{ steps.pages.outputs.base_url }}/data/creneaux.json"
+      - name: Dernier envoi du raccourci iPhone
+        id: iphone
+        run: |
+          if git fetch --depth=1 origin telephone 2>/dev/null && git show FETCH_HEAD:envoi.gz > "$RUNNER_TEMP/envoi.gz" 2>/dev/null; then
+            echo "date=$(git log -1 --format=%cI FETCH_HEAD)" >> "$GITHUB_OUTPUT"
+            echo "Envoi iPhone du $(git log -1 --format=%cI FETCH_HEAD)"
+          else
+            echo "Aucun envoi iPhone pour l'instant"
+          fi
+
+      - name: Collecte
+        run: |
+          options=(--precedent "${{ steps.pages.outputs.base_url }}/data/creneaux.json")
+          if [ -n "${{ steps.iphone.outputs.date }}" ]; then
+            options+=(--telephone "$RUNNER_TEMP/envoi.gz" --telephone-date "${{ steps.iphone.outputs.date }}")
+          fi
+          # Envoi iPhone : seulement ses clubs, les autres gardent leur état (page à jour en 1 à 2 min).
+          if [ "${{ github.ref }}" = "refs/heads/telephone" ]; then
+            options+=(--seulement-telephone)
+          fi
+          python -m collecteur "${options[@]}"
 
       - uses: actions/upload-pages-artifact@v3
         with:

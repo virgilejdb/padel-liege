@@ -24,6 +24,13 @@ class ErreurHttp(Exception):
     pass
 
 
+def construire_url(url: str, params=None) -> str:
+    """Adresse complète d'une requête. Sert aussi à retrouver une réponse envoyée par l'iPhone."""
+    if params:
+        url += ("&" if "?" in url else "?") + urllib.parse.urlencode(params, doseq=True, safe=":[]")
+    return url
+
+
 class Client:
     def __init__(self, pause=(PAUSE_MIN, PAUSE_MAX)):
         self.pause = pause
@@ -36,8 +43,7 @@ class Client:
         self._dernier_appel = time.monotonic()
 
     def get(self, url: str, params=None, entetes=None) -> bytes:
-        if params:
-            url += ("&" if "?" in url else "?") + urllib.parse.urlencode(params, doseq=True, safe=":[]")
+        url = construire_url(url, params)
         h = {
             "User-Agent": USER_AGENT,
             "Accept": "application/json, text/plain, */*",
@@ -74,3 +80,25 @@ class Client:
 
     def get_texte(self, url: str, params=None, entetes=None) -> str:
         return self.get(url, params, entetes).decode("utf-8", errors="replace")
+
+
+class ClientRejoue:
+    """Répond à partir de réponses déjà récupérées ailleurs (par le raccourci iPhone), sans réseau."""
+
+    rejoue = True
+
+    def __init__(self, reponses: dict[str, str]):
+        self.reponses = reponses
+
+    def get_texte(self, url: str, params=None, entetes=None) -> str:
+        cle = construire_url(url, params)
+        if cle not in self.reponses:
+            raise ErreurHttp(f"réponse absente de l'envoi iPhone : {cle}")
+        return self.reponses[cle]
+
+    def get_json(self, url: str, params=None, entetes=None):
+        texte = self.get_texte(url, params, entetes)
+        try:
+            return json.loads(texte)
+        except ValueError as e:
+            raise ErreurHttp(f"réponse non JSON dans l'envoi iPhone : {texte[:120]!r}") from e

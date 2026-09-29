@@ -13,7 +13,7 @@ from __future__ import annotations
 import re
 from datetime import date, datetime, timezone
 
-from ..http import Client
+from ..http import Client, construire_url
 from ..modele import FUSEAU, Creneau, nettoyer_nom
 
 PARAMETRES = ("facility", "slug")
@@ -59,18 +59,24 @@ def interpreter(html: str, club_id: str, slug: str) -> list[Creneau]:
     return creneaux
 
 
+def _creneaux(p: dict, jour: date) -> tuple[str, dict]:
+    return f"{SITE}/book/listSlots", {"wl": "", "facility": p["facility"], "date": jour.isoformat(),
+                                      "sport": PADEL, "week": "", "year": ""}
+
+
+def requetes(club, jours: list[date]) -> list[str]:
+    """Adresses à interroger depuis l'iPhone."""
+    return [construire_url(*_creneaux(club.params, j)) for j in jours]
+
+
 def collecter(club, jours: list[date], client: Client) -> list[Creneau]:
     p = club.params
     page = f"{SITE}/facilities/{p['slug']}"
     creneaux = []
     for jour in jours:
-        html = client.get_texte(
-            f"{SITE}/book/listSlots",
-            params={"wl": "", "facility": p["facility"], "date": jour.isoformat(),
-                    "sport": PADEL, "week": "", "year": ""},
-            entetes={"X-Requested-With": "XMLHttpRequest", "Accept": "text/html, */*; q=0.01",
-                     "Referer": page},
-        )
+        url, params = _creneaux(p, jour)
+        html = client.get_texte(url, params=params, entetes={
+            "X-Requested-With": "XMLHttpRequest", "Accept": "text/html, */*; q=0.01", "Referer": page})
         if "<" not in html:  # attendu : un fragment HTML, même vide de créneaux
             raise ValueError(f"réponse inattendue : {html[:100]!r}")
         creneaux += interpreter(html, club.id, p["slug"])

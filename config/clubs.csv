@@ -13,14 +13,14 @@ neupre,TPC Neupré,Neupré,doinsport,club=0bcf0ff9-910e-4f8e-a14c-bc49852ab9ec;a
 just-padel,Just Padel,Nandrin,doinsport,club=fcba5649-c20a-4f98-b5c7-bd91fc13088d;activites=ce8c306e-224a-4f24-aa9d-6500580924dc;site=just-padel
 trooz,TC Trooz,Trooz,doinsport,club=720cea8e-5b94-4f4f-93f6-d5722f430479;activites=ce8c306e-224a-4f24-aa9d-6500580924dc;site=tennisclubdetrooz
 tultay,Padel Tultay,Sprimont,doinsport,club=fa0c18d6-65c9-4f38-9984-bab064a4437f;activites=ce8c306e-224a-4f24-aa9d-6500580924dc;site=padeltultay
-garrincha,GARRINCHA Liège Wandre,Liège (Wandre),playtomic,tenant=9e7c9904-3cd0-461f-bab8-b7a030bdf2d7;slug=garrincha-liege-wandre
-liers,Addict Padel Liers,Herstal (Liers),playtomic,tenant=f7e16b1f-7829-4eb7-bc29-3f2132becb58;slug=addict-padel-liers
-awans,Padel Square Awans,Awans,playtomic,tenant=6b99ad95-24cb-41e6-8e02-aeac1f365a7f;slug=padel-square-awans
-beaufays,Beaufays TC & Padel,Chaudfontaine (Beaufays),playtomic,tenant=d6f0424a-0c91-4780-8e37-7daaa6ff68f5;slug=beaufays-tennis-club-padel
-baudouin,Royal Baudouin TPC,Liège,sportfinder,produit=190;centre=19051;slug=royal-baudouin-tennis-padel-club
-grace,RTPC Grâce,Grâce-Hollogne,sportfinder,produit=206;centre=19056;slug=rtc-grace-padel;interieur=non
-trenta,Trenta Padel,Crisnée,sportfinder,produit=27;centre=318;slug=trenta-padel
+garrincha,GARRINCHA Liège Wandre,Liège (Wandre),playtomic,tenant=9e7c9904-3cd0-461f-bab8-b7a030bdf2d7;slug=garrincha-liege-wandre;via=telephone
+liers,Addict Padel Liers,Herstal (Liers),playtomic,tenant=f7e16b1f-7829-4eb7-bc29-3f2132becb58;slug=addict-padel-liers;via=telephone
+awans,Padel Square Awans,Awans,playtomic,tenant=6b99ad95-24cb-41e6-8e02-aeac1f365a7f;slug=padel-square-awans;via=telephone
+beaufays,Beaufays TC & Padel,Chaudfontaine (Beaufays),playtomic,tenant=d6f0424a-0c91-4780-8e37-7daaa6ff68f5;slug=beaufays-tennis-club-padel;via=telephone
+baudouin,Royal Baudouin TPC,Liège,sportfinder,produit=190;centre=19051;slug=royal-baudouin-tennis-padel-club;via=telephone
+grace,RTPC Grâce,Grâce-Hollogne,sportfinder,produit=206;centre=19056;slug=rtc-grace-padel;interieur=non;via=telephone
+trenta,Trenta Padel,Crisnée,sportfinder,produit=27;centre=318;slug=trenta-padel;via=telephone
 chenee,Chênée TSP,Liège (Chênée),anybuddy,slug=chenee-tennis-squash-padel-liege
 fleron,Horizon Padel Fléron,Fléron,anybuddy,slug=padel-fleron-centre-de-loisirs-retinne-fleron
-goose-vise,Goose Padel Visé,Visé,matchi,facility=1252;slug=goosepadelvise
+goose-vise,Goose Padel Visé,Visé,matchi,facility=1252;slug=goosepadelvise;via=telephone
 embourg,TPC Embourg,Chaudfontaine (Embourg),bigcaptain,tenant=242;alias=tc-embourg;discipline=7017;durees=90;interieur=non
