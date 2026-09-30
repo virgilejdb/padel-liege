@@ -9,9 +9,7 @@ const DEPOT = "virgilejdb/padel-liege";
 const PAGE = "https://virgilejdb.github.io/padel-liege/";
 const API = `https://api.github.com/repos/${DEPOT}`;
 const NOM_CLE = "padel-liege-github";
-const ATTENTE_MAX_MS = 90 * 1000; // la mise à jour seule prend environ 30 secondes
-
-const pause = (ms) => new Promise((fini) => Timer.schedule(ms, false, fini));
+const PAR_SITE = 3; // requêtes simultanées au plus vers un même site
 
 async function message(titre, texte, boutons = ["OK"]) {
   const a = new Alert();
@@ -65,7 +63,8 @@ async function main() {
   const urls = envoi.requetes || [];
   if (!urls.length) throw new Error("La liste des adresses est vide.");
 
-  // 2. Interrogation depuis l'iPhone : les sites en parallèle, mais une requête à la fois par site.
+  // 2. Interrogation depuis l'iPhone : les sites en parallèle, au plus PAR_SITE requêtes à la fois par site.
+  const depart = Date.now();
   const reponses = {};
   const echecs = [];
   const parSite = {};
@@ -74,8 +73,9 @@ async function main() {
     (parSite[site] = parSite[site] || []).push(url);
   }
   let faites = 0;
-  async function interrogerSite(site, adresses) {
-    for (const url of adresses) {
+  async function interroger(site, file) {
+    let url;
+    while ((url = file.shift())) {
       try {
         const q = new Request(url);
         q.timeoutInterval = 20;
@@ -87,10 +87,13 @@ async function main() {
       }
       faites++;
       console.log(`${faites}/${urls.length} ${site}`);
-      await pause(250);
     }
   }
-  await Promise.all(Object.keys(parSite).map((site) => interrogerSite(site, parSite[site])));
+  const taches = [];
+  for (const site of Object.keys(parSite)) {
+    for (let i = 0; i < PAR_SITE; i++) taches.push(interroger(site, parSite[site]));
+  }
+  await Promise.all(taches);
   if (!Object.keys(reponses).length) throw new Error(`Aucune réponse obtenue. ${echecs.slice(0, 3).join(" ; ")}`);
   envoi.reponses = reponses;
 
@@ -105,9 +108,8 @@ async function main() {
     { message: "Envoi iPhone", tree: arbre.sha, parents: [], author: signature, committer: signature }, cle);
   await github("/git/refs/heads/telephone", "PATCH", { sha: commit.sha, force: true }, cle);
 
-  // 4. Lancement de la mise à jour de la page, puis attente de sa fin.
-  // Sans la permission « Actions » de la clé, l'envoi sera repris par la prochaine collecte automatique.
-  const depart = Date.now();
+  // 4. Lancement de la mise à jour, puis ouverture immédiate de la page : c'est elle qui patiente
+  //    (bandeau « Mise à jour en cours ») et se redessine quand les nouvelles données sont publiées.
   let lancee = true;
   try {
     await github("/actions/workflows/collecte.yml/dispatches", "POST", { ref: "main", inputs: { iphone: "true" } }, cle);
@@ -115,36 +117,16 @@ async function main() {
     console.error(e);
     lancee = false;
   }
-  // Si la mise à jour attend derrière une collecte automatique (5 min), on ne fait pas attendre l'utilisateur.
-  let conclusion = null;
-  let enFile = false;
-  while (lancee && Date.now() - depart < ATTENTE_MAX_MS) {
-    await pause(5000);
-    const runs = await github("/actions/workflows/collecte.yml/runs?event=workflow_dispatch&per_page=1", "GET", null, cle);
-    const run = runs.workflow_runs[0];
-    if (!run || Date.parse(run.created_at) < depart - 60000) continue; // pas encore visible
-    if (run.status === "completed") {
-      conclusion = run.conclusion;
-      break;
-    }
-    if (["queued", "pending", "waiting"].includes(run.status) && Date.now() - depart > 15000) {
-      enFile = true;
-      break;
-    }
-    console.log("Mise à jour de la page en cours…");
-  }
+  console.log(`Terminé en ${Math.round((Date.now() - depart) / 1000)} s`);
 
-  const bilan = `${Object.keys(reponses).length} réponses sur ${urls.length} envoyées.` +
-    (echecs.length ? `\n${echecs.length} échecs : ${[...new Set(echecs)].slice(0, 3).join(" ; ")}` : "");
-  const titre = !lancee || enFile ? "Envoi réussi"
-    : conclusion === "success" ? "Page à jour"
-    : conclusion ? "Échec de la mise à jour" : "Mise à jour encore en cours";
-  const suite = !lancee
-    ? "\nMise à jour immédiate refusée (permission « Actions » de la clé) : la page sera à jour à la prochaine collecte automatique, sous 30 minutes."
-    : enFile ? "\nUne collecte automatique est en cours : la page sera à jour d'ici 5 minutes environ."
-    : conclusion === "success" ? "" : conclusion
-    ? "\nDétail dans l'onglet Actions du dépôt." : "\nLa page sera à jour d'ici une minute.";
-  if ((await message(titre, bilan + suite, ["Ouvrir la page", "Fermer"])) === 0) Safari.open(`${PAGE}?maj=${Date.now()}`);
+  // Message seulement en cas de souci ; sinon on ouvre directement la page.
+  if (echecs.length || !lancee) {
+    const texte = `${Object.keys(reponses).length} réponses sur ${urls.length} envoyées.` +
+      (echecs.length ? `\n${echecs.length} échecs : ${[...new Set(echecs)].slice(0, 3).join(" ; ")}` : "") +
+      (!lancee ? "\nMise à jour immédiate refusée (permission « Actions » de la clé) : la page sera à jour à la prochaine collecte automatique, sous 15 minutes." : "");
+    if ((await message("Envoi terminé", texte, ["Ouvrir la page", "Fermer"])) !== 0) return;
+  }
+  Safari.open(`${PAGE}?attente=${depart}`);
 }
 
 try {

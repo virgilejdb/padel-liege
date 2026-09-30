@@ -3,7 +3,7 @@
 Tous les créneaux de padel libres des clubs autour de Liège, sur les 7 prochains jours, sur une seule page pensée pour le téléphone.
 
 - La collecte (Python, bibliothèque standard uniquement) interroge chaque plateforme de réservation.
-- Une GitHub Action la relance toutes les 30 minutes et publie la page et les données sur GitHub Pages.
+- Une GitHub Action la relance toutes les 15 minutes et publie la page et les données sur GitHub Pages.
 - Aucun serveur, aucune base de données, aucun identifiant : seules des pages publiques sont lues.
 
 ## Clubs couverts
@@ -33,6 +33,17 @@ Ouvrez l'adresse GitHub Pages du dépôt sur le téléphone, puis ajoutez-la à 
 En haut, la pastille indique l'état des données. Elle passe en orange si un club n'a pas pu être actualisé ou si la dernière collecte date de plus de 90 minutes. Touchez-la pour voir le détail club par club. Les créneaux d'un club en panne restent affichés, avec la mention « Pas actualisé depuis… ».
 
 Touchez une heure pour voir les terrains, les durées et les prix, puis « Réserver ». Le lien ouvre le planning du club, à la bonne date pour Playtomic et MATCHi. Sur les autres plateformes, il faut choisir le jour sur place.
+
+## Logos
+
+Les logos sont dans `docs/logos/<id>.png` (128 px), téléchargés une fois depuis votre ordinateur :
+
+```
+py -m pip install pillow
+py outils/logos.py
+```
+
+L'outil prend le logo publié par la plateforme (Doinsport, Sport-finder, MATCHi) ou l'icône du site web du club (Playtomic). Sans logo, la page affiche les initiales du club. Pour en choisir un vous-même : paramètre `logo=<adresse de l'image>` dans `config/clubs.csv` puis `py outils/logos.py --tous`, ou déposez directement une image carrée dans `docs/logos/<id>.png`.
 
 ## Organisation
 
@@ -128,7 +139,7 @@ En production, un site qui change de structure fait passer son club en erreur (p
 
 - Une requête toutes les 1,5 à 3,5 secondes par site. Les plateformes sont interrogées en parallèle, mais jamais deux requêtes à la fois vers le même site.
 - En-têtes d'un navigateur ordinaire, une seule reprise en cas d'erreur, puis abandon jusqu'à la collecte suivante.
-- Environ 130 requêtes par collecte automatique pour 17 clubs, toutes les 30 minutes, dont 110 vers Doinsport (7 jours pour 14 clubs). Le script iPhone en ajoute environ 60, seulement quand vous le lancez.
+- Environ 130 requêtes par collecte automatique pour 17 clubs, toutes les 15 minutes, dont 110 vers Doinsport (7 jours pour 14 clubs). Le script iPhone en ajoute environ 60, seulement quand vous le lancez.
 - Les sites qui refusent les serveurs de GitHub ne sont plus sollicités depuis GitHub.
 
 ## Clubs relevés par l'iPhone
@@ -137,7 +148,7 @@ Les clubs marqués `via=telephone` dans `config/clubs.csv` ne sont jamais interr
 
 1. Chaque collecte publie la liste des adresses à interroger : `data/telephone-requetes.json`.
 2. Le script « Padel » de l'app Scriptable interroge ces adresses depuis l'iPhone (environ 60 requêtes, moins d'une minute), puis remplace le contenu de la branche `telephone` par ses réponses (fichier `envoi.json`, sans historique).
-3. Il lance ensuite l'Action en mode « iPhone », qui relit les réponses avec les adaptateurs habituels, et attend la fin de la mise à jour (1 à 2 minutes).
+3. Il lance ensuite l'Action en mode « iPhone », qui relit les réponses avec les adaptateurs habituels, puis ouvre la page (environ 20 secondes en tout). La page affiche « Mise à jour en cours… » et se redessine seule quand les nouvelles données sont publiées (environ 30 secondes, jusqu'à 5 minutes si une collecte automatique est déjà en cours).
 4. Les collectes suivantes réutilisent ce dernier envoi. La page indique « Relevé par l'iPhone il y a… » et propose le bouton **Actualiser depuis l'iPhone** quand il date de plus d'une heure.
 
 Les noms des terrains Playtomic viennent de `config/terrains_playtomic.json`, pour que le script n'ait pas à télécharger les pages des clubs. Si un club Playtomic change ses terrains, lancez depuis votre ordinateur `py outils/terrains_playtomic.py`, puis commitez le fichier.

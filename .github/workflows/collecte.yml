@@ -2,7 +2,7 @@ name: Collecte des créneaux
 
 on:
   schedule:
-    - cron: "7,37 * * * *"   # toutes les 30 min (GitHub peut retarder de quelques minutes)
+    - cron: "7,22,37,52 * * * *"   # toutes les 15 min (GitHub peut retarder de quelques minutes)
   workflow_dispatch:          # bouton « Run workflow », ou appel du raccourci iPhone après son envoi
     inputs:
       iphone:

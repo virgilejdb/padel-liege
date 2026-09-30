@@ -1,6 +1,6 @@
 // Réseau d'abord, cache en secours : la page s'ouvre même sans connexion,
 // avec les derniers créneaux chargés (l'en-tête indique alors « Hors ligne » ou l'heure de mise à jour).
-const CACHE = "padel-v3";
+const CACHE = "padel-v4";
 const COQUILLE = ["./", "index.html", "manifest.webmanifest", "icones/icone-192.png"];
 
 self.addEventListener("install", (e) => {

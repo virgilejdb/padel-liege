@@ -273,6 +273,10 @@ def main(argv=None) -> int:
             "nb_creneaux": len(lignes),
         })
 
+    # Logo du club s'il a été téléchargé (outils/logos.py) ; sinon la page affiche ses initiales.
+    for c in sortie_clubs:
+        c["logo"] = f"logos/{c['id']}.png" if (RACINE / "docs" / "logos" / f"{c['id']}.png").exists() else None
+
     liens, lignes = encoder(sortie_creneaux)
     donnees = {"version": 2, "genere_le": horodatage, "jours": [j.isoformat() for j in jours],
                "clubs": sortie_clubs, "colonnes": COLONNES, "liens": liens, "creneaux": lignes}

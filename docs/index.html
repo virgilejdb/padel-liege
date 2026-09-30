@@ -65,6 +65,7 @@ header {
 }
 .titre { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 h1 { font-size: 20px; margin: 0; letter-spacing: -.01em; display: flex; align-items: center; gap: 8px; }
+.merci { font-size: 11px; font-weight: 400; color: #9fb0c6; letter-spacing: 0; align-self: flex-end; padding-bottom: 3px; margin-left: -3px; }
 h1::before { content: ""; width: 14px; height: 14px; border-radius: 50%; background: var(--balle); box-shadow: inset -3px -2px 0 rgba(0,0,0,.15); }
 #etat {
   background: rgba(255,255,255,.1); border: 0; border-radius: 999px;
@@ -102,7 +103,14 @@ select {
 main { padding: 6px 16px; display: grid; gap: 12px; }
 #resume { font-size: 13px; color: var(--doux); padding: 0 2px; }
 .club { background: var(--carte); border-radius: 16px; padding: 14px; box-shadow: var(--ombre); border: 1px solid var(--ligne); }
-.club-tete { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.club-tete { display: flex; align-items: center; gap: 12px; }
+.club-nom { display: flex; flex-direction: column; min-width: 0; }
+.logo { width: 40px; height: 40px; border-radius: 10px; flex: 0 0 auto; object-fit: cover; background: #fff; }
+.logo.petit { width: 26px; height: 26px; border-radius: 7px; }
+.initiales { display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 14px; letter-spacing: .02em; }
+.logo.petit.initiales { font-size: 10px; }
+@keyframes tourne { to { transform: rotate(360deg); } }
+.roue { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--ligne); border-top-color: var(--accent); animation: tourne .8s linear infinite; flex: 0 0 auto; }
 .club h2 { font-size: 16px; margin: 0; }
 .commune { font-size: 13px; color: var(--doux); }
 .badge-ancien { margin-top: 6px; font-size: 12.5px; color: var(--alerte); background: var(--alerte-fond); border-radius: 8px; padding: 4px 8px; display: inline-block; }
@@ -154,7 +162,7 @@ dialog::backdrop { background: rgba(5, 10, 20, .55); }
 <body>
 <header>
   <div class="titre">
-    <h1>Padel Liège</h1>
+    <h1>Padel Liège <small class="merci">(merci Calvi)</small></h1>
     <button id="etat" type="button">Chargement…</button>
   </div>
   <div id="jours" role="group" aria-label="Jour"></div>
@@ -198,7 +206,7 @@ dialog::backdrop { background: rgba(5, 10, 20, .55); }
 const DONNEES = "data/creneaux.json";
 const DUREES = [30, 60, 90, 120];
 const LIEUX = [["tous", "Tous"], ["int", "Intérieur"], ["ext", "Extérieur"]];
-const RETARD_ALERTE_MIN = 90; // au delà, on signale une collecte en panne
+const RETARD_ALERTE_MIN = 45; // au delà, on signale une collecte en panne
 const IPHONE_ANCIEN_MIN = 60; // au delà, on propose d'actualiser les clubs relevés par l'iPhone
 const RACCOURCI = "scriptable:///run/Padel"; // script Scriptable installé via iphone.html
 const JOURS_COURTS = ["dim.", "lun.", "mar.", "mer.", "jeu.", "ven.", "sam."];
@@ -224,9 +232,12 @@ function ecrirePrefs() {
     lieu: etat.lieu, masques: [...etat.masques] })); } catch {}
 }
 const prefs = lirePrefs();
+// Horaire en minutes depuis minuit (les anciennes préférences étaient en heures).
+const enMinutes = (v, defaut) => v == null ? defaut : v <= 24 ? v * 60 : v;
 const etat = {
   donnees: null, creneaux: [], clubs: new Map(), jour: null,
-  de: prefs.de ?? 6, a: prefs.a ?? 24,
+  de: enMinutes(prefs.de, 360), a: enMinutes(prefs.a, 1440),
+  attente: 0, // heure du lancement du script iPhone, tant que ses données ne sont pas arrivées
   durees: new Set(prefs.durees ?? [60, 90, 120]),
   lieu: prefs.lieu ?? "tous",
   masques: new Set(prefs.masques ?? []),
@@ -278,6 +289,7 @@ async function charger() {
     const jours = [...new Set(d.jours)];
     const auj = maintenantBxl().date;
     if (!etat.jour || !jours.includes(etat.jour) || etat.jour < auj) etat.jour = jours.find((j) => j >= auj) || jours[0];
+    verifierAttente();
     dessinerTout();
   } catch (e) {
     $("#etat").textContent = "Hors ligne";
@@ -285,9 +297,49 @@ async function charger() {
     if (!etat.donnees) $("#resultats").replaceChildren(el("p", { class: "message" },
       "Impossible de charger les créneaux. Vérifiez la connexion puis rouvrez la page."));
   }
+  if (etat.attente) { clearTimeout(etat.minuterie); etat.minuterie = setTimeout(charger, 6000); }
+}
+
+// Suivi d'un relevé iPhone : la page patiente à la place du script, puis se redessine.
+const ATTENTE_MAX_MIN = 8; // une collecte automatique en cours peut retarder la mise à jour de 5 minutes
+function lireAttente() {
+  let t = +(new URLSearchParams(location.search).get("attente") || 0);
+  try { t = Math.max(t, +(localStorage.getItem("padel-attente") || 0)); } catch {}
+  return ageMin(new Date(t).toISOString()) < ATTENTE_MAX_MIN ? t : 0;
+}
+function finAttente() {
+  etat.attente = 0;
+  try { localStorage.removeItem("padel-attente"); } catch {}
+  if (location.search.includes("attente")) history.replaceState(null, "", location.pathname);
+}
+function verifierAttente() {
+  if (!etat.attente || !etat.donnees) return;
+  const clubsIphone = etat.donnees.clubs.filter(parIphone);
+  // Marge d'une minute et demie pour l'écart d'horloge entre l'iPhone et GitHub.
+  const arrives = clubsIphone.every((c) => c.derniere_maj_ok && Date.parse(c.derniere_maj_ok) >= etat.attente - 90000);
+  if (arrives || ageMin(new Date(etat.attente).toISOString()) >= ATTENTE_MAX_MIN) finAttente();
 }
 
 function dessinerTout() { dessinerEtat(); dessinerJours(); dessinerFiltres(); dessinerResultats(); }
+
+// Logo du club (docs/logos), ou ses initiales sur une couleur tirée de son nom.
+const MOTS_VIDES = new Set(["de", "du", "la", "le", "les", "&", "et"]);
+function logoClub(club, taille = "") {
+  const classe = `logo ${taille}`.trim();
+  if (club.logo) {
+    const img = el("img", { class: classe, src: club.logo, alt: "", loading: "lazy" });
+    img.onerror = () => img.replaceWith(initiales(club, classe));
+    return img;
+  }
+  return initiales(club, classe);
+}
+function initiales(club, classe) {
+  const mots = club.nom.split(/\s+/).filter((m) => !MOTS_VIDES.has(m.toLowerCase()));
+  const texte = mots.slice(0, 2).map((m) => m[0]).join("").toUpperCase();
+  let h = 0;
+  for (const ch of club.id) h = (h * 31 + ch.charCodeAt(0)) % 360;
+  return el("span", { class: `${classe} initiales`, style: `background:hsl(${h} 45% 38%)`, "aria-hidden": "true" }, texte);
+}
 
 // Clubs relevés par le raccourci iPhone (sites qui refusent les serveurs de GitHub).
 const parIphone = (c) => c.via === "telephone";
@@ -296,7 +348,7 @@ const iphoneAncien = (c) => parIphone(c) && ageMin(c.derniere_maj_ok) > IPHONE_A
 const enPanne = (c) => parIphone(c) ? c.statut === "erreur" : c.statut !== "ok";
 // Au retour sur la page après le script, on recharge les données sans attendre les 5 minutes habituelles.
 const boutonIphone = (texte = "Actualiser depuis l'iPhone") => el("a", { class: "bouton-iphone", href: RACCOURCI,
-  onclick: () => { etat.charge = 0; } }, texte);
+  onclick: () => { try { localStorage.setItem("padel-attente", String(Date.now())); } catch {} } }, texte);
 
 function dessinerEtat() {
   const d = etat.donnees, clubs = d.clubs;
@@ -322,10 +374,11 @@ function dessinerJours() {
 function dessinerFiltres() {
   const de = $("#de"), a = $("#a");
   if (!de.options.length) {
-    for (let h = 6; h <= 23; h++) de.append(new Option(`${h} h`, h));
-    for (let h = 7; h <= 24; h++) a.append(new Option(h === 24 ? "minuit" : `${h} h`, h));
-    de.onchange = () => { etat.de = +de.value; if (etat.a <= etat.de) etat.a = etat.de + 1; majFiltres(); };
-    a.onchange = () => { etat.a = +a.value; if (etat.de >= etat.a) etat.de = etat.a - 1; majFiltres(); };
+    const libelle = (m) => m === 1440 ? "minuit" : `${Math.floor(m / 60)} h${m % 60 ? " 30" : ""}`;
+    for (let m = 360; m <= 1410; m += 30) de.append(new Option(libelle(m), m));
+    for (let m = 390; m <= 1440; m += 30) a.append(new Option(libelle(m), m));
+    de.onchange = () => { etat.de = +de.value; if (etat.a <= etat.de) etat.a = etat.de + 30; majFiltres(); };
+    a.onchange = () => { etat.a = +a.value; if (etat.de >= etat.a) etat.de = etat.a - 30; majFiltres(); };
   }
   de.value = etat.de; a.value = etat.a;
 
@@ -347,7 +400,8 @@ function majFiltres() { ecrirePrefs(); dessinerFiltres(); dessinerResultats(); }
 
 function filtrer() {
   const n = maintenantBxl();
-  const de = `${String(etat.de).padStart(2, "0")}:00`, a = etat.a === 24 ? "24:00" : `${String(etat.a).padStart(2, "0")}:00`;
+  const hhmm = (m) => `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
+  const de = hhmm(etat.de), a = hhmm(etat.a);
   return etat.creneaux.filter((c) =>
     c.date === etat.jour && c.heure >= de && c.heure < a &&
     !(c.date === n.date && c.heure < n.heure) &&
@@ -377,7 +431,8 @@ function dessinerResultats() {
     const triees = [...heures.keys()].sort();
     nbHeures += triees.length;
     cartes.push(el("article", { class: "club" },
-      el("div", { class: "club-tete" }, el("h2", {}, club.nom), el("span", { class: "commune" }, club.commune)),
+      el("div", { class: "club-tete" }, logoClub(club),
+        el("div", { class: "club-nom" }, el("h2", {}, club.nom), el("span", { class: "commune" }, club.commune))),
       iphoneAncien(club) ? el("div", { class: "badge-iphone" }, `Relevé par l'iPhone ${depuis(club.derniere_maj_ok)}`) :
       enPanne(club) ? el("div", { class: "badge-ancien" },
         `Pas actualisé depuis ${club.derniere_maj_ok ? depuis(club.derniere_maj_ok).replace("il y a ", "") : "le début"} : à vérifier sur le site`) : null,
@@ -396,9 +451,13 @@ function dessinerResultats() {
     ? `${nomJour(etat.jour, true)} : ${nbHeures} horaire${nbHeures > 1 ? "s" : ""} libre${nbHeures > 1 ? "s" : ""} dans ${cartes.length} club${cartes.length > 1 ? "s" : ""}`
     : "";
 
-  // Bandeau iPhone : visible quand les clubs relevés par l'iPhone datent de plus d'une heure.
-  const aActualiser = visibles.filter(iphoneAncien);
-  if (aActualiser.length) {
+  // Bandeau iPhone : mise à jour en cours, ou clubs relevés par l'iPhone depuis plus d'une heure.
+  const aActualiser = etat.attente ? [] : visibles.filter(iphoneAncien);
+  if (etat.attente) {
+    cartes.unshift(el("div", { class: "bandeau-iphone" }, el("span", { class: "roue" }),
+      el("span", { style: "flex:1" }, "Mise à jour depuis l'iPhone en cours… La page se rafraîchit toute seule.")));
+    aActualiser.push(null); // le bandeau compte comme une carte pour le message « aucun créneau »
+  } else if (aActualiser.length) {
     const plusRecent = aActualiser.map((c) => c.derniere_maj_ok).filter(Boolean).sort().pop();
     cartes.unshift(el("div", { class: "bandeau-iphone" },
       el("span", {}, plusRecent
@@ -445,7 +504,7 @@ function ouvrirClubs() {
     const cb = el("input", { type: "checkbox" });
     cb.checked = !etat.masques.has(c.id);
     cb.onchange = () => { cb.checked ? etat.masques.delete(c.id) : etat.masques.add(c.id); };
-    return el("label", {}, cb, c.nom, el("small", {}, c.commune));
+    return el("label", {}, cb, logoClub(c, "petit"), c.nom, el("small", {}, c.commune));
   }));
   $("#clubs-tous").onclick = () => { etat.masques.clear(); dessiner(); };
   $("#clubs-aucun").onclick = () => { etat.donnees.clubs.forEach((c) => etat.masques.add(c.id)); dessiner(); };
@@ -467,7 +526,7 @@ function ouvrirEtat() {
   };
   $("#etat-detail").replaceChildren(
     el("h3", {}, "État des clubs"),
-    el("div", { class: "sous" }, `Dernière collecte ${depuis(d.genere_le)} (${heureDe(d.genere_le)}). Actualisation toutes les 30 min environ.`),
+    el("div", { class: "sous" }, `Dernière collecte ${depuis(d.genere_le)} (${heureDe(d.genere_le)}). Actualisation toutes les 15 min environ.`),
     d.clubs.some(parIphone) ? el("p", { class: "note", style: "margin-top:0" },
       "Playtomic, Sport-finder et MATCHi refusent les serveurs de GitHub : leurs clubs sont relevés par le script « Padel » de l'iPhone (",
       el("a", { href: "iphone.html" }, "installation"), "). ", boutonIphone("Lancer le script")) : null,
@@ -486,12 +545,17 @@ for (const dlg of document.querySelectorAll("dialog"))
   dlg.addEventListener("click", (e) => { if (e.target === dlg) dlg.close(); });
 
 // Recharge quand on revient sur la page (écran d'accueil), au plus toutes les 5 minutes.
+// Au retour sur la page : suivi du relevé iPhone s'il vient d'être lancé, sinon recharge au plus toutes les 5 minutes.
 document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "visible" && Date.now() - etat.charge > 5 * 60000) charger();
+  if (document.visibilityState !== "visible") return;
+  const t = lireAttente();
+  if (t > etat.attente) { etat.attente = t; if (etat.donnees) dessinerResultats(); charger(); }
+  else if (Date.now() - etat.charge > 5 * 60000) charger();
 });
 setInterval(() => { if (etat.donnees) dessinerEtat(); }, 60000);
 
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+etat.attente = lireAttente();
 charger();
 </script>
 </body>
